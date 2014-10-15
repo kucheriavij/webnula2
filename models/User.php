@@ -139,6 +139,16 @@ class User extends Entity
 			'groups' => array( self::MANY_MANY, 'webnula2\models\AuthItem', '{{authassignment}}(userid, itemname)' )
 		);
 	}
+	
+	/**
+	 * @return array
+	 */
+	public function behaviors()
+	{
+		return array(
+			'ar-relation' => 'webnula2.extensions.EActiveRecordRelationBehavior',
+		);
+	}
 
 	/**
 	 * @return bool
