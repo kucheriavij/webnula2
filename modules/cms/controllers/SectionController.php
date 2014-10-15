@@ -183,7 +183,7 @@ class SectionController extends Controller
 	{
 		$modelName = \CHtml::modelName( $node );
 
-		$form = new TbForm( $node->forms( $this, $node->parent ) );
+		$form = new TbForm( $node->forms( $this, isset($node) ? $node->parent : null ) );
 		if ( $form->submitted( 'save' ) ) {
 			$node = $form->getModel();
 
@@ -213,6 +213,11 @@ class SectionController extends Controller
 		) );
 	}
 
+	/**
+	 * @param Section $section
+	 *
+	 * @throws \Exception
+	 */
 	public function renderModels( Section $section )
 	{
 		$tabs = array();
@@ -258,6 +263,12 @@ class SectionController extends Controller
 		) );
 	}
 
+	/**
+	 * @param $model
+	 * @param $method
+	 *
+	 * @return bool|mixed
+	 */
 	public function invokeWith( $model, $method )
 	{
 		$method = new \ReflectionMethod( $model, $method );

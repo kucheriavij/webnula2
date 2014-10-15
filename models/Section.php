@@ -434,7 +434,7 @@ class Section extends Entity
 					'buttonType' => 'link',
 					'context' => 'default',
 					'label' => \Yii::t( 'webnula2.locale', 'Cancel' ),
-					'url' => $this->parent_id ? array( 'section/index', 'uuid' => $parent->uuid ) : array( 'section/index' )
+					'url' => isset($parent) ? array( 'section/index', 'uuid' => $parent->uuid ) : array( 'section/index' )
 				)
 			)
 		);
