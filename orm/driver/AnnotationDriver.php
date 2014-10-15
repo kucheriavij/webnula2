@@ -159,9 +159,12 @@ final class AnnotationDriver extends \CComponent
 		$declared = get_declared_classes();
 		foreach ( $declared as $className ) {
 			$class = new \ReflectionClass( $className );
-			$classes[] = $class;
-			$this->classes[$class->getName()] = $class;
+			if( $class->isSubclassOf('webnula2\models\Entity') ) {
+				$classes[] = $class;
+				$this->classes[$class->getName()] = $class;
+			}
 		}
+
 		return $classes;
 	}
 } 

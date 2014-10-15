@@ -237,13 +237,13 @@ final class SchemaTool extends \CApplicationComponent
 		$transaction = $db->beginTransaction();
 		try {
 			foreach( $this->driver->getClasses() as $class ) {
-				$instance = $class->newInstance();
+				$instance = $class->newInstance(null);
 				$instance->beforeSchemaUpdate();
 			}
 			$transaction->commit();
 		} catch( \Exception $e ) {
 			$transaction->rollback();
-			throw $e;
+			\Yii::log($e->getMessage(), \CLogger::LEVEL_ERROR,'webnula2.components');
 		}
 	}
 
@@ -260,7 +260,7 @@ final class SchemaTool extends \CApplicationComponent
 			$transaction->commit();
 		} catch( \Exception $e ) {
 			$transaction->rollback();
-			throw $e;
+			\Yii::log($e->getMessage(), \CLogger::LEVEL_ERROR, 'webnula2.components');
 		}
 	}
 } 
