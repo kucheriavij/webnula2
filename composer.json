@@ -1,0 +1,25 @@
+{
+    "name": "webnula/webnula2",
+    "description": "WebNula modernized content system management based on Yii framework.",
+    "keywords" : ["app", "yii", "framework", "webnula", "web", "nula"],
+    "minimum-stability": "stable",
+    "license": "MIT",
+	"type" : "library",
+    "version" : "1.0.0",
+    "authors": [
+        {
+            "name": "Martyushev Dmitriy",
+            "email": "dangozero@gmail.com"
+        }
+    ],
+	"support": {
+		"issues": "https://github.com/dangozero/webnula2/issues?state=open",
+		"wiki": "https://github.com/dangozero/webnula2/wiki",
+		"source": "https://github.com/dangozero/webnula2"
+	},
+    "require": {
+        "yiisoft/yii": ">=1.1.15",
+        "smarty/smarty": ">=v3.1.19",
+        "imagine/imagine": ">=0.2.5"
+    }
+}
