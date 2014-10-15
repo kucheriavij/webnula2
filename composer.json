@@ -19,7 +19,6 @@
 	},
     "require": {
         "yiisoft/yii": ">=1.1.15",
-        "smarty/smarty": ">=v3.1.19",
         "imagine/imagine": ">=0.2.5"
     }
 }
