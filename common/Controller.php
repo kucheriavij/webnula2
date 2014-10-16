@@ -178,6 +178,7 @@ class Controller extends \CController {
 	{
 		$rawPathInfo = $this->params['routeInfo'];
 
+		$actionID = null;
 		if( !empty($this->_rules) ) {
 			if( is_string($this->_rules) )
 				$actionID = $this->_rules;
