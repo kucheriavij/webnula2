@@ -25,7 +25,12 @@ class Controller extends \CController {
 	 */
 	public $params;
 
+	/**
+	 * @var array
+	 */
 	private $rules = array();
+
+	public $assetsUrl = '';
 
 	/**
 	 *
@@ -34,18 +39,34 @@ class Controller extends \CController {
 	{
 		$this->params = \Yii::app()->urlManager->getParams();
 		$this->processRules();
+
+		if( ($assetsPath = \Yii::getPathOfAlias('application.assets')) && is_file($assetsPath)) {
+			$this->assetsUrl = ( YII_DEBUG ?
+				\Yii::app()->getAssetManager()->publish( $assetsPath, false, -1, true ) :
+				\Yii::app()->getAssetManager()->publish( $assetsPath )
+			);
+		}
 	}
 
+	/**
+	 * @return CAttributeCollection
+	 */
 	public function getActionParams()
 	{
 		return $this->params;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function route()
 	{
 		return array();
 	}
 
+	/**
+	 *
+	 */
 	private function processRules()
 	{
 		$rules = $this->route();
@@ -107,6 +128,9 @@ class Controller extends \CController {
 			$this->missingAction($actionID);
 	}
 
+	/**
+	 * @param $output
+	 */
 	public function json($output) {
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -116,6 +140,9 @@ class Controller extends \CController {
 		\Yii::app()->end();
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getCacheKey()
 	{
 		return get_class($this);
