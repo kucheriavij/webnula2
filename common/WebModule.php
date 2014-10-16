@@ -33,6 +33,9 @@ abstract class WebModule extends \CWebModule {
 	 */
 	public $cs;
 
+	/**
+	 *
+	 */
 	protected function init()
 	{
 		$this->cs = \Yii::app()->getClientScript();
@@ -56,14 +59,14 @@ abstract class WebModule extends \CWebModule {
 	 * @param string $cssFile
 	 */
 	public function registerCssFile($cssFile) {
-		$this->cs->registerCssFile($this->assetsUrl . '/' .$cssFile);
+		$this->cs->registerCssFile($this->_assetsUrl . '/' .$cssFile);
 	}
 
 	/**
 	 * @param string $scriptFile
 	 */
 	public function registerScriptFile($scriptFile) {
-		$this->cs->registerScriptFile($this->assetsUrl . '/' .$scriptFile);
+		$this->cs->registerScriptFile($this->_assetsUrl . '/' .$scriptFile);
 	}
 
 	/**
