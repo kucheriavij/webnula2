@@ -4,6 +4,8 @@
  */
 
 namespace webnula2\widgets\booster;
+use webnula2\components\Booster;
+
 /**
  *## TbTimePicker widget.
  *
@@ -15,7 +17,7 @@ namespace webnula2\widgets\booster;
  */
 
 class TbTimePicker extends TbBaseInputWidget {
-	
+
 	/**
 	 * @var TbActiveForm If we're called from the form, here lies the reference to it.
 	 */
@@ -72,7 +74,7 @@ class TbTimePicker extends TbBaseInputWidget {
 	 * Runs the widget.
 	 */
 	public function run() {
-		
+
 		list($name) = $this->resolveNameID();
 
 		// TODO: what is this?
@@ -116,8 +118,8 @@ class TbTimePicker extends TbBaseInputWidget {
 	 * @param string $id
 	 */
 	public function registerClientScript($id) {
-		
-        Booster::getBooster()->cs->registerPackage('timepicker');
+
+		Booster::getBooster()->cs->registerPackage('timepicker');
 
 		$options = !empty($this->options) ? \CJavaScript::encode($this->options) : '';
 
@@ -128,7 +130,7 @@ class TbTimePicker extends TbBaseInputWidget {
 			echo ".on('{$event}', " . \CJavaScript::encode($handler) . ")";
 		}
 
-		Yii::app()->getClientScript()->registerScript(__CLASS__ . '#' . $id, ob_get_clean() . ';');
+		\Yii::app()->getClientScript()->registerScript(__CLASS__ . '#' . $id, ob_get_clean() . ';');
 	}
 
 	/**
@@ -138,7 +140,7 @@ class TbTimePicker extends TbBaseInputWidget {
 	 * @return array
 	 */
 	private function injectClass($valueset, $className) {
-		
+
 		if (array_key_exists('class', $valueset) and is_string($valueset['class'])) {
 			$valueset['class'] = implode(
 				' ',
@@ -158,7 +160,7 @@ class TbTimePicker extends TbBaseInputWidget {
 	}
 
 	private function echoAppend() {
-		
+
 		echo \CHtml::tag('span', array('class' => 'input-group-addon'), \CHtml::tag('i', array('class' => 'glyphicon glyphicon-time'), ''));
 	}
 }
