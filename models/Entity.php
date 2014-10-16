@@ -151,4 +151,20 @@ abstract class Entity extends \CActiveRecord
 
 		return new \CActiveDataProvider( $this, $config );
 	}
+
+	/**
+	 * @param $controller
+	 * @param $node
+	 * @param $uuid
+	 * @param $options
+	 */
+	public function render($controller, $node, $uuid, $options)
+	{
+		$options = array_merge($options, array(
+			'dataProvider' => $controller->invokeWith( $this, 'search' ),
+			'columns' => $controller->invokeWith( $this, 'columns' ),
+		));
+
+		$this->widget( 'webnula2\widgets\booster\TbGridView', $options);
+	}
 }

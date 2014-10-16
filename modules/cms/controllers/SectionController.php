@@ -239,13 +239,12 @@ class SectionController extends Controller
 					'buttons' => $this->invokeWith( $model, 'buttons' ),
 				) );
 
-				$this->widget( 'webnula2\widgets\booster\TbGridView', array(
-					'id' => strtolower( \CHtml::modelName( $model ) ),
+				$this->params->add('options', array(
+					'id' => strtolower(\CHtml::modelName($model)),
 					'template' => '{pager}{items}{pager}',
-					'type' => 'striped bordered condensed',
-					'dataProvider' => $this->invokeWith( $model, 'search' ),
-					'columns' => $this->invokeWith( $model, 'columns' ),
-				) );
+					'type' => 'striped bordered condensed'
+				));
+				$this->invokeWith($model, 'render');
 
 
 				$this->endClip();
@@ -262,35 +261,6 @@ class SectionController extends Controller
 		$this->widget( 'webnula2\widgets\booster\TbTabs', array(
 			'tabs' => $tabs
 		) );
-	}
-
-	/**
-	 * @param $model
-	 * @param $method
-	 *
-	 * @return bool|mixed
-	 */
-	public function invokeWith( $model, $method )
-	{
-		$method = new \ReflectionMethod( $model, $method );
-		$params = $this->params;
-		$ps = array();
-		foreach ( $method->getParameters() as $i => $param ) {
-			$name = $param->getName();
-			if ( isset( $params[$name] ) ) {
-				if ( $param->isArray() )
-					$ps[] = is_array( $params[$name] ) ? $params[$name] : array( $params[$name] );
-				elseif ( !is_array( $params[$name] ) )
-					$ps[] = $params[$name];
-				else
-					return false;
-			} elseif ( $param->isDefaultValueAvailable() )
-				$ps[] = $param->getDefaultValue();
-			else
-				return false;
-		}
-
-		return $method->invokeArgs( $model, $ps );
 	}
 
 	/**

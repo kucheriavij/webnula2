@@ -76,6 +76,35 @@ abstract class Controller extends \CController
 	}
 
 	/**
+	 * @param $model
+	 * @param $method
+	 *
+	 * @return bool|mixed
+	 */
+	public function invokeWith( $model, $method )
+	{
+		$method = new \ReflectionMethod( $model, $method );
+		$params = $this->params;
+		$ps = array();
+		foreach ( $method->getParameters() as $i => $param ) {
+			$name = $param->getName();
+			if ( isset( $params[$name] ) ) {
+				if ( $param->isArray() )
+					$ps[] = is_array( $params[$name] ) ? $params[$name] : array( $params[$name] );
+				elseif ( !is_array( $params[$name] ) )
+					$ps[] = $params[$name];
+				else
+					return false;
+			} elseif ( $param->isDefaultValueAvailable() )
+				$ps[] = $param->getDefaultValue();
+			else
+				return false;
+		}
+
+		return $method->invokeArgs( $model, $ps );
+	}
+
+	/**
 	 * @throws \CHttpException
 	 * @throws \Exception
 	 */
