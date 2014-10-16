@@ -141,6 +141,7 @@ class SectionController extends Controller
 	{
 		$model = $this->loadModel( @$_POST['id'] );
 		$modelName = \CHtml::modelName( $model );
+		$model->access = array('Guest');
 
 
 		$form = new TbForm( $model->forms( $this, $node ) );
@@ -153,7 +154,7 @@ class SectionController extends Controller
 
 			if ( $form->validate() ) {
 				if ( empty( $model->access ) ) {
-					$model->setAttribute('access', array( 'Guest' ));
+					$model->access = array( 'Guest' );
 				}
 
 				if ( $node ) {
@@ -189,7 +190,7 @@ class SectionController extends Controller
 
 			if ( $form->validate() ) {
 				if ( empty( $node->access ) ) {
-					$node->setAttribute('access', array( 'Guest' ));
+					$node->access = array( 'Guest' );
 				}
 
 				if ( !empty( $_POST['prevname'] ) && $node->name !== $_POST['prevname'] ) {
