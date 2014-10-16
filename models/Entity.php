@@ -165,6 +165,6 @@ abstract class Entity extends \CActiveRecord
 			'columns' => $controller->invokeWith( $this, 'columns' ),
 		));
 
-		$this->widget( 'webnula2\widgets\booster\TbGridView', $options);
+		$controller->widget( 'webnula2\widgets\booster\TbGridView', $options);
 	}
 }
