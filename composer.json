@@ -18,7 +18,7 @@
 		"source": "https://github.com/dangozero/webnula2"
 	},
     "require": {
-        "yiisoft/yii": ">=1.1.15",
+        "yiisoft/yii": "1.1.15",
         "imagine/imagine": ">=0.2.5"
     }
 }

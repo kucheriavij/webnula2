@@ -269,7 +269,6 @@ class Section extends Entity
 		if ( parent::beforeSave() ) {
 			$this->uuid = sha1( $this->url );
 			$this->models = \CJSON::encode( is_array( $this->models ) ? $this->models : array() );
-
 			return true;
 		}
 
