@@ -5,6 +5,7 @@
  * @license LICENSE
  */
 namespace webnula2\common;
+use webnula2\components\UrlRule;
 
 
 /**
@@ -160,7 +161,7 @@ class Controller extends \CController {
 		if( !empty($rules) ) {
 			if( is_array($rules) ) {
 				foreach( $rules as $pattern => $route ) {
-					$this->rules[] = new \CUrlRule($route, $pattern);
+					$this->rules[] = new UrlRule($route, $pattern);
 				}
 			} else if( is_string($rules) ) {
 				$this->rules = $rules;
