@@ -57,7 +57,7 @@ class Controller extends \CController {
 
 		$this->cs = \Yii::app()->getClientScript();
 		if(($packages = \Yii::getPathOfAlias('application.config.packages')) && is_file($packages.'.php')) {
-			$packages = (array)require_once $packages;
+			$packages = (array)require_once $packages.'.php';
 			foreach( $packages as $name => $package ) {
 				$this->cs->addPackage($name, $package);
 				$this->cs->registerPackage($name);
