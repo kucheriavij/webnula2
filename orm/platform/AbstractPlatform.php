@@ -217,7 +217,7 @@ abstract class AbstractPlatform extends \CComponent
 		$unique = ( isset( $column->unique ) && $column->unique ) ?
 			' ' . $this->getUniqueFieldDeclarationSQL() : '';
 
-		$typeDecl = $table->isPk( $column->name ) ? $this->getPkType() : $this->getSqlType( $column );
+		$typeDecl = $table->isExtra( $column->name ) ? $this->getPkType() : $this->getSqlType( $column );
 		$columnDef = $typeDecl . $charset . $default . $notnull . $unique . $collation;
 
 		if ( isset( $column->comment ) && $column->comment ) {

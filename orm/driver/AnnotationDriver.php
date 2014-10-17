@@ -77,6 +77,7 @@ final class AnnotationDriver extends \CComponent
 					if ( isset( $propAnnot['Id'] ) ) {
 						$ar->table->setIdentifierType(Table::GENERATOR_AUTO_INCREMENT);
 						$ar->table->addPrimaryKey($column->name);
+						$ar->table->addExtra($column->name);
 						$column->setNotNull( true );
 					}
 

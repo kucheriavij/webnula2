@@ -47,9 +47,14 @@ final class Table extends \CComponent implements Annotation
 	private $primaryKey = null;
 
 	/**
-	 * @var
+	 * @var int
 	 */
 	private $identifierType;
+
+	/**
+	 * @var array
+	 */
+	private $extra = array();
 
 	/**
 	 *
@@ -211,6 +216,27 @@ final class Table extends \CComponent implements Annotation
 			$this->name = $parts[0];
 			$this->rawName = \Yii::app()->schematool->quoteName( $this->name );
 		}
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isExtra( $name )
+	{
+		return isset($this->extra[$name]);
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @throws \CException
+	 */
+	public function addExtra( $name ) {
+		if( count($this->extra) ) {
+			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have @Id field.',array('{name}' => $this->rawName)));
+		}
+
+		$this->extra[$name] = true;
 	}
 
 	/**
