@@ -16,7 +16,7 @@ namespace webnula2\orm;
 final class ActiveRecordMetadata extends \CComponent
 {
 	/**
-	 * @var
+	 * @var Table
 	 */
 	private $table;
 	/**

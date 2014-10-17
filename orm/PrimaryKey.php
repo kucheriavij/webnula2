@@ -18,7 +18,7 @@ class PrimaryKey extends \CComponent implements Annotation {
 	/**
 	 * @var array
 	 */
-	private $columns;
+	private $columns = array();
 	/**
 	 * @var string
 	 */
@@ -33,13 +33,16 @@ class PrimaryKey extends \CComponent implements Annotation {
 	 * @param array $columns
 	 * @param string $name
 	 */
-	public function __construct(Table $table, $columns, $name = null) {
-		$this->setColumns($columns);
+	public function __construct(Table $table, $name = null) {
 		$this->table = $table;
+	}
 
-		if( $name === null ) {
-			$this->name = sprintf("pk_%s_%s", crc32($table->rawName), crc32( serialize($columns) ));
-		}
+	/**
+	 * @return bool
+	 */
+	public function getIsEmpty()
+	{
+		return count($this->columns) == 0;
 	}
 
 	/**
@@ -47,6 +50,7 @@ class PrimaryKey extends \CComponent implements Annotation {
 	 */
 	public function getColumns()
 	{
+		$this->validateKey();
 		return $this->columns;
 	}
 
@@ -58,10 +62,9 @@ class PrimaryKey extends \CComponent implements Annotation {
 	public function setColumns( $columns )
 	{
 		foreach( $columns as $column ) {
-			$this->columns[$column] = $columns;
+			$this->columns[$column] = $column;
 		}
 
-		$this->validateKey();
 		$this->name = sprintf('pk_%s_%s', crc32($this->table->rawName), crc32(serialize($this->columns)));
 	}
 
@@ -72,7 +75,6 @@ class PrimaryKey extends \CComponent implements Annotation {
 	 */
 	public function addColumn($name) {
 		$this->columns[$name] = $name;
-		$this->validateKey();
 		$this->name = sprintf('pk_%s_%s', crc32($this->table->rawName), crc32(serialize($this->columns)));
 	}
 
@@ -108,13 +110,12 @@ class PrimaryKey extends \CComponent implements Annotation {
 	public function setTable( $table )
 	{
 		$this->table = $table;
-		$this->validateKey();
 	}
 
 	/**
 	 * @throws \CException
 	 */
-	private function validateKey()
+	public function validateKey()
 	{
 		foreach( $this->columns as $column ) {
 			if( !$this->table->hasColumn($column) ) {
@@ -132,7 +133,7 @@ class PrimaryKey extends \CComponent implements Annotation {
 		if( count($this->columns) != count($other->columns) ) {
 			return false;
 		}
-		return md5(serialize( $this->columns )) === md5(serialize( $this->columns ));
+		return md5(serialize( $this->columns )) === md5(serialize( $other->columns ));
 	}
 
 	/**

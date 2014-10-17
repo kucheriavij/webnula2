@@ -20,9 +20,9 @@ final class TableDiff extends \CComponent
 	 */
 	public $name = null;
 	/**
-	 * @var string
+	 * @var bool
 	 */
-	public $newName = null;
+	public $newName = false;
 	/**
 	 * @var array|Column[]
 	 */
@@ -68,17 +68,17 @@ final class TableDiff extends \CComponent
 
 
 	/**
-	 * @var array|PrimaryKey[]
+	 * @var PrimaryKey
 	 */
-	public $addedPrimaryKeys = array();
+	public $addedPrimaryKey = null;
 	/**
-	 * @var array|PrimaryKey[]
+	 * @var PrimaryKey
 	 */
-	public $changedPrimaryKeys = array();
+	public $changedPrimaryKey = null;
 	/**
-	 * @var array|PrimaryKey[]
+	 * @var PrimaryKey
 	 */
-	public $removedPrimaryKeys = array();
+	public $removedPrimaryKey = null;
 
 	/**
 	 * @param $name

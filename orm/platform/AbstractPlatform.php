@@ -300,32 +300,32 @@ abstract class AbstractPlatform extends \CComponent
 	/**
 	 * @param TableDiff $table
 	 */
-	protected function preAlterTable( TableDiff $table )
+	protected function preAlterTable( TableDiff $diff )
 	{
 		$sql = array();
 
-		foreach ( $table->removedForeignKeys as $fk ) {
+		foreach ( $diff->removedForeignKeys as $fk ) {
 			$sql[] = $this->dropForeignKey( $fk, $fk->table );
 		}
 
-		foreach ( $table->changedForeignKeys as $fk ) {
+		foreach ( $diff->changedForeignKeys as $fk ) {
 			$sql[] = $this->dropForeignKey( $fk, $fk->table );
 		}
 
-		foreach ( $table->removedIndexes as $index ) {
+		foreach ( $diff->removedIndexes as $index ) {
 			$sql[] = $this->dropIndex( $index, $index->table );
 		}
 
-		foreach ( $table->changedIndexes as $index ) {
+		foreach ( $diff->changedIndexes as $index ) {
 			$sql[] = $this->dropIndex( $index, $index->table );
 		}
 
-		foreach ( $table->removedPrimaryKeys as $pk ) {
-			$sql[] = $this->dropPrimaryKey( $pk );
+		if ( isset( $diff->removedPrimaryKey ) ) {
+			$sql[] = $this->dropPrimaryKey( $diff->removedPrimaryKey );
 		}
 
-		foreach ( $table->changedPrimaryKeys as $pk ) {
-			$sql[] = $this->dropPrimaryKey( $pk );
+		if ( isset( $diff->changedPrimaryKey ) ) {
+			$sql[] = $this->dropPrimaryKey( $diff->changedPrimaryKey );
 		}
 
 		return $sql;
@@ -370,12 +370,12 @@ abstract class AbstractPlatform extends \CComponent
 			$sql[] = $this->addForeignKey( $fk, $fk->table );
 		}
 
-		foreach( $diff->addedPrimaryKeys as $pk ) {
-			$sql[] = $this->addPrimaryKey( $pk );
+		if ( isset( $diff->addedPrimaryKey ) ) {
+			$sql[] = $this->addPrimaryKey( $diff->addedPrimaryKey );
 		}
 
-		foreach( $diff->changedPrimaryKeys as $pk ) {
-			$sql[] = $this->addPrimaryKey( $pk );
+		if ( isset( $diff->changedPrimaryKey ) ) {
+			$sql[] = $this->addPrimaryKey( $diff->changedPrimaryKey );
 		}
 
 		return $sql;

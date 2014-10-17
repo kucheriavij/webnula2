@@ -9,6 +9,7 @@
 namespace webnula2\orm\driver;
 
 use webnula2\orm\ActiveRecordMetadata;
+use webnula2\orm\Table;
 
 
 /**
@@ -74,7 +75,8 @@ final class AnnotationDriver extends \CComponent
 					$column->name = substr($propertyName, 1);
 
 					if ( isset( $propAnnot['Id'] ) ) {
-						$ar->table->addPk( $column );
+						$ar->table->setIdentifierType(Table::GENERATOR_AUTO_INCREMENT);
+						$ar->table->addPrimaryKey($column->name);
 						$column->setNotNull( true );
 					}
 

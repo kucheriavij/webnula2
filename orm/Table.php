@@ -7,6 +7,7 @@
  */
 
 namespace webnula2\orm;
+
 use webnula2\common\Annotation;
 
 
@@ -43,12 +44,22 @@ final class Table extends \CComponent implements Annotation
 	/**
 	 * @var PrimaryKey
 	 */
-	private $primaryKeys = array();
+	private $primaryKey = null;
 
 	/**
-	 * @var null
+	 * @var
 	 */
-	private $pk = null;
+	private $identifierType;
+
+	/**
+	 *
+	 */
+	const GENERATOR_NONE = 0;
+
+	/**
+	 *
+	 */
+	const GENERATOR_AUTO_INCREMENT = 1;
 
 	/**
 	 * @param $name
@@ -56,6 +67,10 @@ final class Table extends \CComponent implements Annotation
 	function __construct( $name = null )
 	{
 		$this->setName( $name );
+
+		$this->setIdentifierType(self::GENERATOR_NONE);
+
+		$this->primaryKey = new PrimaryKey( $this );
 	}
 
 	/**
@@ -73,9 +88,9 @@ final class Table extends \CComponent implements Annotation
 	 */
 	public function hasColumn( $column )
 	{
-		if( $column instanceof Column ) {
+		if ( $column instanceof Column ) {
 			return isset( $this->columns[$column->name] );
-		} else if( is_string($column) ) {
+		} else if ( is_string( $column ) ) {
 			return isset( $this->columns[$column] );
 		}
 	}
@@ -83,7 +98,7 @@ final class Table extends \CComponent implements Annotation
 	/**
 	 * @param $name
 	 *
-	 * @return null
+	 * @return null|Column
 	 */
 	public function getColumn( $name )
 	{
@@ -130,7 +145,7 @@ final class Table extends \CComponent implements Annotation
 	public function setIndexes( array $indexes )
 	{
 		foreach ( $indexes as $idx ) {
-			$this->addIndex($idx);
+			$this->addIndex( $idx );
 		}
 	}
 
@@ -139,15 +154,15 @@ final class Table extends \CComponent implements Annotation
 	 */
 	public function addIndex( Index $index )
 	{
-		foreach ($this->indexes AS $existingIndex) {
-			if ($index->is($existingIndex)) {
+		foreach ( $this->indexes AS $existingIndex ) {
+			if ( $index->is( $existingIndex ) ) {
 				return;
 			}
 		}
 
-		foreach ($this->indexes AS $idxKey => $existingIndex) {
-			if ($index->overrules($existingIndex)) {
-				unset($this->indexes[$idxKey]);
+		foreach ( $this->indexes AS $idxKey => $existingIndex ) {
+			if ( $index->overrules( $existingIndex ) ) {
+				unset( $this->indexes[$idxKey] );
 			}
 		}
 
@@ -160,11 +175,12 @@ final class Table extends \CComponent implements Annotation
 	 *
 	 * @return bool
 	 */
-	public function hasIndex( $index ) {
-		if( $index instanceof Index ) {
-			return isset($this->indexes[$index->name]);
-		} else if( is_string($index) ) {
-			return isset($this->indexes[$index]);
+	public function hasIndex( $index )
+	{
+		if ( $index instanceof Index ) {
+			return isset( $this->indexes[$index->name] );
+		} else if ( is_string( $index ) ) {
+			return isset( $this->indexes[$index] );
 		}
 	}
 
@@ -198,11 +214,27 @@ final class Table extends \CComponent implements Annotation
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getIsPrimaryKeyComposite()
+	{
+		return count( $this->primaryKey->columns ) > 1;
+	}
+
+	/**
+	 * @param int $type
+	 */
+	public function setIdentifierType( $type )
+	{
+		$this->identifierType = $type;
+	}
+
+	/**
 	 * @return PrimaryKey
 	 */
 	public function getPrimaryKeys()
 	{
-		return $this->primaryKeys;
+		return $this->primaryKey;
 	}
 
 	/**
@@ -210,25 +242,30 @@ final class Table extends \CComponent implements Annotation
 	 */
 	public function addPrimaryKey( $name )
 	{
-		if( isset($this->pk) ) {
-			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have a primaryKey'));
+		if ( $this->identifierType === self::GENERATOR_AUTO_INCREMENT && $this->getIsPrimaryKeyComposite() ) {
+			throw new \CException( \Yii::t( 'webnula2.locale', 'Table "{name}" must have only one primary key with AUTO_INCREMENT.' ) );
 		}
-		if( !isset($this->primaryKeys) ) {
-			$this->primaryKeys = new PrimaryKey( $this, array() );
+		if( ($column = $this->getColumn($name)) ) {
+			$column->setNotnull(true);
 		}
-		$this->primaryKeys->addColumn($name);
+		$this->primaryKey->addColumn( $name );
 	}
 
 	/**
 	 * @param array $keys
 	 */
-	public function setPrimaryKeys(array $keys) {
-		if( isset($this->pk) ) {
-			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have a primaryKey'));
+	public function setPrimaryKeys( array $keys )
+	{
+		foreach( $keys as $name )  {
+			if( ($column = $this->getColumn($name)) ) {
+				$column->setNotnull(true);
+			}
 		}
+		$this->primaryKey->setColumns( $keys );
 
-		$this->primaryKeys = new PrimaryKey( $this, array() );
-		$this->primaryKeys->setColumns($keys);
+		if ( $this->identifierType === self::GENERATOR_AUTO_INCREMENT && $this->getIsPrimaryKeyComposite() ) {
+			throw new \CException( \Yii::t( 'webnula2.locale', 'Table "{name}" must have only one primary key with AUTO_INCREMENT.' ) );
+		}
 	}
 
 	/**
@@ -236,44 +273,9 @@ final class Table extends \CComponent implements Annotation
 	 *
 	 * @return bool
 	 */
-	public function hasPrimaryKey( $key ) {
-		return isset($this->primaryKeys) && isset($this->primaryKeys->columns[$key]);
-	}
-
-	/**
-	 * @param $pk
-	 */
-	public function addPk( $pk )
+	public function hasPrimaryKey( $key )
 	{
-		$this->pk[$pk->name] = $pk;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getHasPk()
-	{
-		return isset( $this->pk );
-	}
-
-	/**
-	 * @param $name
-	 *
-	 * @return null
-	 */
-	public function getPk( $name )
-	{
-		return $this->isPk( $name ) ? $this->pk[$name] : null;
-	}
-
-	/**
-	 * @param $name
-	 *
-	 * @return bool
-	 */
-	public function isPk( $name )
-	{
-		return isset( $this->pk[$name] );
+		return isset( $this->primaryKey ) && isset( $this->primaryKey->columns[$key] );
 	}
 
 	/**
@@ -297,11 +299,11 @@ final class Table extends \CComponent implements Annotation
 	 */
 	function validate()
 	{
-		if( empty($this->name) ) {
-			throw new \CException(\Yii::t('webnula2.locale', 'Name cannot be empty.'));
+		if ( empty( $this->name ) ) {
+			throw new \CException( \Yii::t( 'webnula2.locale', 'Name cannot be empty.' ) );
 		}
-		if( !is_array($this->indexes) ) {
-			throw new \CException(\Yii::t('webnula2.locale', 'Indexes must be array.'));
+		if ( !is_array( $this->indexes ) ) {
+			throw new \CException( \Yii::t( 'webnula2.locale', 'Indexes must be array.' ) );
 		}
 	}
 } 

@@ -348,8 +348,12 @@ final class MysqlPlatform extends AbstractPlatform
 		$c = new Column();
 		$c->setName( $column['Field'] );
 		$c->setNotnull( $column['Null'] !== 'YES' );
-		if ( strpos( $column['Key'], 'PRI' ) !== false ) {
-			$table->addPk( $c );
+		if (
+			strpos( $column['Key'], 'PRI' ) !== false &&
+			(isset($column['Extra']) && $column['Extra'] === 'auto_increment')
+		) {
+			$table->setIdentifierType(Table::GENERATOR_AUTO_INCREMENT);
+			$table->addPrimaryKey($c->name);
 		}
 		$c->setDefaultValue( $column['Default'] );
 		$c->setComment( $column['Comment'] );
@@ -432,11 +436,13 @@ final class MysqlPlatform extends AbstractPlatform
 			$line = trim($line);
 			if( preg_match('!^PRIMARY KEY\s*\(([^\)]+)\)!i', $line, $match) ) {
 				$columns = array_map( 'trim', explode( ',', str_replace( array( '`', '"' ), '', $match[1] ) ) );
-				foreach ( $columns as &$column ) {
-					if ( ( $pos = strpos( $column, '(' ) ) !== false ) {
-						$column = substr( $column, 0, $pos );
+				if( !$table->IsPrimaryKeyComposite ) {
+					foreach ( $columns as &$column ) {
+						if ( ( $pos = strpos( $column, '(' ) ) !== false ) {
+							$column = substr( $column, 0, $pos );
+						}
+						$table->addPrimaryKey( $column );
 					}
-					$table->addPrimaryKey( $column );
 				}
 			} else if( preg_match('!^(?:UNIQUE )?KEY\s+([^\(^\s]+)\s*\(([^\)]+)\)!i', $line, $match) ) {
 				$columns = array_map( 'trim', explode( ',', str_replace( array( '`', '"' ), '', $match[2] ) ) );

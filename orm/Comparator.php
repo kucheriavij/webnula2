@@ -29,7 +29,7 @@ final class Comparator extends \CComponent
 
 		foreach ( $toSchema->getTables() AS $table ) {
 			if ( !$fromSchema->hasTable( $table ) ) {
-				$diff->newTables[$table->name] = $toSchema->getTable($table->rawName);
+				$diff->newTables[$table->name] = $toSchema->getTable( $table->rawName );
 			} else {
 				$tableDifferences = $this->diffTable( $fromSchema->getTable( $table->rawName ), $table );
 				if ( $tableDifferences !== false ) {
@@ -59,6 +59,7 @@ final class Comparator extends \CComponent
 				$diff->orphanedForeignKeys = array_merge( $diff->orphanedForeignKeys, $foreignKeysToTable[$tableName] );
 			}
 		}
+
 		return $diff;
 	}
 
@@ -138,15 +139,17 @@ final class Comparator extends \CComponent
 		$pk1 = $table1->getPrimaryKeys();
 		$pk2 = $table2->getPrimaryKeys();
 
-		if( !isset($pk2) ) {
-			$tableDifferences->addedPrimaryKeys[] = $pk1;
-		} else if( !isset($pk1) && isset($pk2)) {
-			$tableDifferences->removedPrimaryKeys[] = $pk2;
-		} else if ( isset($pk1) && isset($pk2) && !$pk1->compareTo( $pk2 ) ) {
-			$tableDifferences->removedPrimaryKeys[] = $pk2;
-			$tableDifferences->changedPrimaryKeys[] = $pk1;
+		if ( !$pk2->isEmpty && $pk1->isEmpty ) {
+			$tableDifferences->addedPrimaryKey = $pk2;
+			$changes++;
+		} else if ( $pk2->isEmpty && !$pk1->isEmpty ) {
+			$tableDifferences->removedPrimaryKey = $pk1;
+			$changes++;
+		} else if ( $pk2->isEmpty && $pk1->isEmpty && !$pk2->compareTo( $pk1 ) ) {
+			$tableDifferences->removedPrimaryKey = $pk1;
+			$tableDifferences->changedPrimaryKey = $pk2;
+			$changes++;
 		}
-
 
 		$fromFkeys = $table1->getForeignKeys();
 		$toFkeys = $table2->getForeignKeys();
