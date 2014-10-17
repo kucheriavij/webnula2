@@ -213,48 +213,52 @@ final class Image extends Entity
 	 */
 	public function getUrl( $name )
 	{
-		$filePath = dirname( $this->file['path'] );
-		$filename = $this->file['originalName'];
-		$url = dirname( $this->file['url'] );
+		if( $name === 'url' ) {
+			return $this->file['url'];
+		} else {
+			$filePath = dirname( $this->file['path'] );
+			$filename = $this->file['originalName'];
+			$url = dirname( $this->file['url'] );
 
-		$destPath = $filePath . '/' . $name . '/' . $filename;
-		$url = $url . '/' . $name . '/' . $filename;
-		if ( !is_file( $destPath ) ) {
-			if ( isset( \Yii::app()->params->imageSizes[$name] ) ) {
-				$config = \Yii::app()->params->imageSizes[$name];
-				$method = $config['method'];
+			$destPath = $filePath . '/' . $name . '/' . $filename;
+			$url = $url . '/' . $name . '/' . $filename;
+			if ( !is_file( $destPath ) ) {
+				if ( isset( \Yii::app()->params->imageSizes[$name] ) ) {
+					$config = \Yii::app()->params->imageSizes[$name];
+					$method = $config['method'];
 
-				self::mkDir( $filePath . '/' . $name );
+					self::mkDir( $filePath . '/' . $name );
 
-				$imagine = new Imagine();
-				$source = $imagine->open( $this->file['path'] );
+					$imagine = new Imagine();
+					$source = $imagine->open( $this->file['path'] );
 
-				if ( method_exists( $this, $method ) ) {
-					$img = $this->$method( $source, $config );
-				} else if ( method_exists( $source, $method ) ) {
-					$img = $source->$method( $config );
+					if ( method_exists( $this, $method ) ) {
+						$img = $this->$method( $source, $config );
+					} else if ( method_exists( $source, $method ) ) {
+						$img = $source->$method( $config );
+					}
+
+					if ( isset( $config['watermark'] ) ) {
+						$watermark = $imagine->open( \Yii::getPathOfAlias( 'webroot' ) . $config['watermark'] );
+						$size = $source->getSize();
+						$wSize = $watermark->getSize();
+
+						$x = $config['x'] ?: 'center';
+						$y = $config['y'] ?: 'center';
+
+						$x = Coordinate::fix( $x, $wSize->getWidth(), $size->getWidth() );
+						$y = Coordinate::fix( $y, $wSize->getHeight(), $size->getHeight() );
+
+						$img = $img->paste( $watermark, new Point( $x, $y ) );
+					}
+
+					$img->save( $destPath );
+					chmod( $destPath, 0666 );
 				}
-
-				if ( isset( $config['watermark'] ) ) {
-					$watermark = $imagine->open( \Yii::getPathOfAlias( 'webroot' ) . $config['watermark'] );
-					$size = $source->getSize();
-					$wSize = $watermark->getSize();
-
-					$x = $config['x'] ?: 'center';
-					$y = $config['y'] ?: 'center';
-
-					$x = Coordinate::fix( $x, $wSize->getWidth(), $size->getWidth() );
-					$y = Coordinate::fix( $y, $wSize->getHeight(), $size->getHeight() );
-
-					$img = $img->paste( $watermark, new Point( $x, $y ) );
-				}
-
-				$img->save( $destPath );
-				chmod( $destPath, 0666 );
 			}
-		}
 
-		return $url;
+			return $url;
+		}
 	}
 
 	/**
