@@ -12,6 +12,7 @@ namespace webnula2\orm\platform;
 use webnula2\orm\Column;
 use webnula2\orm\ForeignKey;
 use webnula2\orm\Index;
+use webnula2\orm\PrimaryKey;
 use webnula2\orm\Table;
 use webnula2\orm\TableDiff;
 
@@ -82,7 +83,7 @@ final class MysqlPlatform extends AbstractPlatform
 
 		$sql = array( $query );
 		if ( !empty( $table->primaryKeys ) ) {
-			$sql[] = $this->addPrimaryKey( $table );
+			$sql[] = $this->addPrimaryKeys( $table );
 		}
 
 		foreach ( $table->getIndexes() as $index ) {
@@ -97,11 +98,12 @@ final class MysqlPlatform extends AbstractPlatform
 	 *
 	 * @return string
 	 */
-	function addPrimaryKey( Table $table )
+	function addPrimaryKeys( Table $table )
 	{
-		$columns = $table->getPrimaryKeys();
-		foreach ( $columns as $i => $col )
-			$columns[$i] = $this->quoteName( $col );
+		$pk = $table->getPrimaryKeys();
+		$columns =array();
+		foreach ( $pk->columns as $column )
+			$columns[] = $this->quoteName( $column );
 
 		return 'ALTER TABLE ' . $table->rawName . ' ADD PRIMARY KEY ('
 		. implode( ', ', $columns ) . ' )';
@@ -144,10 +146,36 @@ final class MysqlPlatform extends AbstractPlatform
 	 *
 	 * @return string
 	 */
-	function dropPrimaryKey( Table $table )
+	function dropPrimaryKeys( Table $table )
 	{
 		return 'ALTER TABLE ' . $table->rawName . ' DROP PRIMARY KEY';
 	}
+
+	/**
+	 * @param PrimaryKey $pk
+	 *
+	 * @return mixed
+	 */
+	function addPrimaryKey( PrimaryKey $pk )
+	{
+		$columns =array();
+		foreach ( $pk->columns as $column )
+			$columns[] = $this->quoteName( $column );
+
+		return 'ALTER TABLE ' . $pk->table->rawName . ' ADD PRIMARY KEY ('
+		. implode( ', ', $columns ) . ' )';
+	}
+
+	/**
+	 * @param PrimaryKey $pk
+	 *
+	 * @return mixed
+	 */
+	function dropPrimaryKey( PrimaryKey $pk )
+	{
+		return 'ALTER TABLE ' . $pk->table->rawName . ' DROP PRIMARY KEY';
+	}
+
 
 	/**
 	 * @param ForeignKey $fk

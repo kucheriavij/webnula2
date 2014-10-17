@@ -16,55 +16,69 @@ namespace webnula2\orm;
 final class TableDiff extends \CComponent
 {
 	/**
-	 * @var null
+	 * @var string
 	 */
 	public $name = null;
 	/**
-	 * @var bool
+	 * @var string
 	 */
-	public $newName = false;
+	public $newName = null;
 	/**
-	 * @var array
+	 * @var array|Column[]
 	 */
 	public $addedColumns = array();
 	/**
-	 * @var array
+	 * @var array|Column[]
 	 */
 	public $changedColumns = array();
 	/**
-	 * @var array
+	 * @var array|Column[]
 	 */
 	public $removedColumns = array();
 	/**
-	 * @var array
+	 * @var array|Column[]
 	 */
 	public $renamedColumns = array();
 
 	/**
-	 * @var array
+	 * @var array|Index[]
 	 */
 	public $addedIndexes = array();
 	/**
-	 * @var array
+	 * @var array|Index[]
 	 */
 	public $changedIndexes = array();
 	/**
-	 * @var array
+	 * @var array|Index[]
 	 */
 	public $removedIndexes = array();
 
 	/**
-	 * @var array
+	 * @var array|ForeignKey[]
 	 */
 	public $addedForeignKeys = array();
 	/**
-	 * @var array
+	 * @var array|ForeignKey[]
 	 */
 	public $changedForeignKeys = array();
 	/**
-	 * @var array
+	 * @var array|ForeignKey[]
 	 */
 	public $removedForeignKeys = array();
+
+
+	/**
+	 * @var array|PrimaryKey[]
+	 */
+	public $addedPrimaryKeys = array();
+	/**
+	 * @var array|PrimaryKey[]
+	 */
+	public $changedPrimaryKeys = array();
+	/**
+	 * @var array|PrimaryKey[]
+	 */
+	public $removedPrimaryKeys = array();
 
 	/**
 	 * @param $name

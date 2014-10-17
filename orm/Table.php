@@ -33,15 +33,15 @@ final class Table extends \CComponent implements Annotation
 	 */
 	private $columns = array();
 	/**
-	 * @var array
+	 * @var array|Index[]
 	 */
 	private $indexes = array();
 	/**
-	 * @var array
+	 * @var array|ForeignKey[]
 	 */
 	private $foreignKeys = array();
 	/**
-	 * @var array
+	 * @var PrimaryKey
 	 */
 	private $primaryKeys = array();
 
@@ -198,7 +198,7 @@ final class Table extends \CComponent implements Annotation
 	}
 
 	/**
-	 * @return array
+	 * @return PrimaryKey
 	 */
 	public function getPrimaryKeys()
 	{
@@ -206,20 +206,38 @@ final class Table extends \CComponent implements Annotation
 	}
 
 	/**
-	 * @param $name
+	 * @param string $name
 	 */
 	public function addPrimaryKey( $name )
 	{
-		$this->primaryKeys[$name] = $name;
+		if( isset($this->pk) ) {
+			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have a primaryKey'));
+		}
+		if( !isset($this->primaryKeys) ) {
+			$this->primaryKeys = new PrimaryKey( $this, array() );
+		}
+		$this->primaryKeys->addColumn($name);
 	}
 
 	/**
-	 * @param $keys
+	 * @param array $keys
 	 */
-	public function setPrimaryKeys($keys) {
-		foreach( $keys as $key ) {
-			$this->primaryKeys[$key]= $key;
+	public function setPrimaryKeys(array $keys) {
+		if( isset($this->pk) ) {
+			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have a primaryKey'));
 		}
+
+		$this->primaryKeys = new PrimaryKey( $this, array() );
+		$this->primaryKeys->setColumns($keys);
+	}
+
+	/**
+	 * @param string $key
+	 *
+	 * @return bool
+	 */
+	public function hasPrimaryKey( $key ) {
+		return isset($this->primaryKeys) && isset($this->primaryKeys->columns[$key]);
 	}
 
 	/**

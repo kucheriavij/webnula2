@@ -133,6 +133,21 @@ final class Comparator extends \CComponent
 			$changes++;
 		}
 
+
+		// primary key compare
+		$pk1 = $table1->getPrimaryKeys();
+		$pk2 = $table2->getPrimaryKeys();
+
+		if( !isset($pk2) ) {
+			$tableDifferences->addedPrimaryKeys[] = $pk1;
+		} else if( !isset($pk1) && isset($pk2)) {
+			$tableDifferences->removedPrimaryKeys[] = $pk2;
+		} else if ( isset($pk1) && isset($pk2) && !$pk1->compareTo( $pk2 ) ) {
+			$tableDifferences->removedPrimaryKeys[] = $pk2;
+			$tableDifferences->changedPrimaryKeys[] = $pk1;
+		}
+
+
 		$fromFkeys = $table1->getForeignKeys();
 		$toFkeys = $table2->getForeignKeys();
 

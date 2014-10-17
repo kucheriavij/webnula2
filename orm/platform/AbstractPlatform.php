@@ -13,6 +13,7 @@ namespace webnula2\orm\platform;
 use webnula2\orm\Column;
 use webnula2\orm\ForeignKey;
 use webnula2\orm\Index;
+use webnula2\orm\PrimaryKey;
 use webnula2\orm\Table;
 use webnula2\orm\TableDiff;
 
@@ -44,7 +45,7 @@ abstract class AbstractPlatform extends \CComponent
 	/**
 	 * @param \CDbConnection $db
 	 *
-	 * @return webnula\orm\platform\AbstractPlatform instance.
+	 * @return AbstractPlatform instance.
 	 */
 	public static function instantiate( \CDbConnection $db )
 	{
@@ -143,14 +144,28 @@ abstract class AbstractPlatform extends \CComponent
 	 *
 	 * @return mixed
 	 */
-	abstract function addPrimaryKey( Table $table );
+	abstract function addPrimaryKeys( Table $table );
 
 	/**
 	 * @param Table $table
 	 *
 	 * @return mixed
 	 */
-	abstract function dropPrimaryKey( Table $table );
+	abstract function dropPrimaryKeys( Table $table );
+
+	/**
+	 * @param PrimaryKey $pk
+	 *
+	 * @return mixed
+	 */
+	abstract function addPrimaryKey( PrimaryKey $pk );
+
+	/**
+	 * @param PrimaryKey $pk
+	 *
+	 * @return mixed
+	 */
+	abstract function dropPrimaryKey( PrimaryKey $pk );
 
 	/**
 	 * @param TableDiff $table
@@ -305,6 +320,14 @@ abstract class AbstractPlatform extends \CComponent
 			$sql[] = $this->dropIndex( $index, $index->table );
 		}
 
+		foreach ( $table->removedPrimaryKeys as $pk ) {
+			$sql[] = $this->dropPrimaryKey( $pk );
+		}
+
+		foreach ( $table->changedPrimaryKeys as $pk ) {
+			$sql[] = $this->dropPrimaryKey( $pk );
+		}
+
 		return $sql;
 	}
 
@@ -345,6 +368,14 @@ abstract class AbstractPlatform extends \CComponent
 
 		foreach ( $diff->changedForeignKeys as $fk ) {
 			$sql[] = $this->addForeignKey( $fk, $fk->table );
+		}
+
+		foreach( $diff->addedPrimaryKeys as $pk ) {
+			$sql[] = $this->addPrimaryKey( $pk );
+		}
+
+		foreach( $diff->changedPrimaryKeys as $pk ) {
+			$sql[] = $this->addPrimaryKey( $pk );
 		}
 
 		return $sql;
