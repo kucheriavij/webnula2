@@ -8,11 +8,38 @@
 
 namespace webnula2\components;
 
-final class Kernel extends \CApplicationComponent
+/**
+ * Class Kernel
+ * @package webnula2\components
+ */
+final class Kernel extends \CComponent implements \IApplicationComponent
 {
+	/**
+	 * @var array
+	 */
+	public $behaviors = array();
+
+	/**
+	 * @var bool
+	 */
+	private $_initialized=false;
+
+	/**
+	 * Checks if this application component has been initialized.
+	 * @return boolean whether this application component has been initialized (ie, {@link init()} is invoked).
+	 */
+	public function getIsInitialized()
+	{
+		return $this->_initialized;
+	}
+
+	/**
+	 * Initializes the application component.
+	 * This method is required by {@link IApplicationComponent} and is invoked by application.
+	 */
 	public function init()
 	{
-		parent::init();
+		$this->_initialized=true;
 
 		$Yii = \Yii::app();
 
@@ -30,13 +57,11 @@ final class Kernel extends \CApplicationComponent
 			)
 		) );
 
-		if( !isset($Yii->params->imageSizes) ) {
-			$Yii->params->add( 'imageSizes', array('t260x180' => array(
-				'method' => 'cropInset',
-				'width' => 260,
-				'height' => 180,
-			) ) );
-		}
+		$Yii->params->add( 'imageSizes', array('t260x180' => array(
+			'method' => 'cropInset',
+			'width' => 260,
+			'height' => 180,
+		) ) );
 
 		if ( \Yii::app() instanceof \CWebApplication ) {
 			\Yii::setPathOfAlias( 'layouts', $Yii->getViewPath() . '/layouts' );

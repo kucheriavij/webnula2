@@ -83,9 +83,9 @@ final class UrlManager extends \CApplicationComponent
 	protected function processRules()
 	{
 		if ( $this->cacheID !== false && ( $cache = \Yii::app()->getComponent( $this->cacheID ) ) !== null ) {
-			$hash = md5( serialize( $this->rules ) );
-			if ( ( $data = $cache->get( self::CACHE_KEY ) ) !== false && isset( $data[1] ) && $data[1] === $hash ) {
-				$this->_rules = $data[0];
+		//	$hash = md5( serialize( $this->rules ) );
+			if ( ( $data = $cache->get( self::CACHE_KEY ) ) !== false /*&& isset( $data[1] ) && $data[1] === $hash */) {
+				$this->_rules = $data;//$data[0];
 
 				return;
 			}
@@ -94,7 +94,7 @@ final class UrlManager extends \CApplicationComponent
 		$this->applyRules(\Yii::app()->getModules());
 
 		if ( isset( $cache ) )
-			$cache->set( self::CACHE_KEY, array( $this->_rules, $hash ) );
+			$cache->set( self::CACHE_KEY, $this->_rules );
 	}
 
 	/**

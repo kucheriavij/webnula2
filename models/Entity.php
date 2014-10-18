@@ -52,9 +52,21 @@ abstract class Entity extends \CActiveRecord
 	public static function metadata()
 	{
 		$className = get_called_class();
+		$cacheKey = 'MetaData@'.$className;
+
+		if ( $cache = \Yii::app()->getComponent( 'cache' ) ) {
+			//	$hash = md5( serialize( $this->rules ) );
+			if ( ( $data = $cache->get( $cacheKey ) ) !== false /*&& isset( $data[1] ) && $data[1] === $hash */) {
+				return $data;
+			}
+		}
+
 		if ( !isset( self::$_metadata[$className] ) ) {
 			self::$_metadata[$className] = \Yii::app()->schematool->getDriver()->loadMetadataForClass( $className );
 		}
+
+		if ( isset( $cache ) )
+			$cache->set( $cacheKey, self::$_metadata[$className] );
 
 		return self::$_metadata[$className];
 	}

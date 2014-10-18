@@ -168,7 +168,7 @@ class Controller extends \CController {
 			}
 		}
 		if(isset($cache))
-			$cache->set($this->cacheKey,array($this->_rules,$hash));
+			$cache->set($this->cacheKey,array($this->rules,$hash));
 	}
 
 	/**

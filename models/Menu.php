@@ -156,6 +156,16 @@ class Menu extends Entity {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function behaviors()
+	{
+		if( isset(\Yii::app()->getComponent('webnula2')->behaviors['menu']) ) {
+			return \Yii::app()->getComponent('webnula2')->behaviors['menu'];
+		}
+	}
+
+	/**
 	 * @return \CActiveDataProvider
 	 */
 	public function search()
