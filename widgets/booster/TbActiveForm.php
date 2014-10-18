@@ -773,6 +773,9 @@ class TbActiveForm extends \CActiveForm
 	 * @return string
 	 */
 	public function tinymceGroup($model, $attribute, $options = array()) {
+		if( !isset($options['widgetOptions']) ) {
+			$options['widgetOptions'] = array();
+		}
 		$options['widgetOptions'] = array_merge(array(
 			'compressorRoute' => '/cms/tinymce/compressor',
 			'spellcheckerUrl' => 'http://speller.yandex.net/services/tinyspell',
@@ -827,25 +830,6 @@ class TbActiveForm extends \CActiveForm
 	public function dateRangeGroup($model, $attribute, $options = array()) {
 
 		return $this->widgetGroupInternal('webnula2\widgets\booster\TbDateRangePicker', $model, $attribute, $options);
-	}
-
-	/**
-	 * Generates a time picker group for a model attribute.
-	 *
-	 * This method is a wrapper for {@link TbTimePicker} widget and {@link customFieldGroup}.
-	 * Please check {@link TbTimePicker} documentation for detailed information about $widgetOptions.
-	 * About $options argument parameters see {@link TbActiveForm} documentation.
-	 *
-	 * @param CModel $model The data model.
-	 * @param string $attribute The attribute.
-	 * @param array $options Group attributes.
-	 * @return string The generated time picker group.
-	 * @see TbTimePicker
-	 * @see customFieldGroup
-	 */
-	public function timePickerGroup($model, $attribute, $options = array()) {
-
-		return $this->widgetGroupInternal('webnula2\widgets\booster\TbTimePicker', $model, $attribute, $options);
 	}
 
 	/**
@@ -1036,6 +1020,25 @@ class TbActiveForm extends \CActiveForm
 		$fieldData = array(array($this->owner, 'widget'), array($className, $widgetOptions, true));
 
 		return $this->customFieldGroupInternal($fieldData, $model, $attribute, $options);
+	}
+
+	/**
+	 * Generates a time picker group for a model attribute.
+	 *
+	 * This method is a wrapper for {@link TbTimePicker} widget and {@link customFieldGroup}.
+	 * Please check {@link TbTimePicker} documentation for detailed information about $widgetOptions.
+	 * About $options argument parameters see {@link TbActiveForm} documentation.
+	 *
+	 * @param CModel $model The data model.
+	 * @param string $attribute The attribute.
+	 * @param array $options Group attributes.
+	 * @return string The generated time picker group.
+	 * @see TbTimePicker
+	 * @see customFieldGroup
+	 */
+	public function timePickerGroup($model, $attribute, $options = array()) {
+
+		return $this->widgetGroupInternal('webnula2\widgets\booster\TbTimePicker', $model, $attribute, $options);
 	}
 
 	/**

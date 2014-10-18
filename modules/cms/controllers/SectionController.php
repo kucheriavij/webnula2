@@ -121,7 +121,7 @@ class SectionController extends Controller
 			$nodes = $command->queryAll();
 
 			foreach ( $nodes as &$node ) {
-				$node['text'] = \CHtml::link( $node['text'], array( 'index', 'uuid' => $node['uuid'] ) );
+				$node['text'] = \CHtml::link( $node['text'], array( '/cms/section/index', 'uuid' => $node['uuid'] ) );
 				unset( $node['uuid'] );
 
 				$node['hasChildren'] = (bool)$node['IS NOT NULL AS hasChildren'];

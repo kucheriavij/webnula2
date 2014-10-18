@@ -47,6 +47,8 @@ class TbFormInputElement extends \CFormElement {
 
 	public $widgetOptions = array();
 
+	public $groupOptions = array();
+
 	/**
 	 * The type of this input. This can be a widget class name, a path alias of a widget class name,
 	 * or an input type alias (text, hidden, password, textarea, file, etc.).
@@ -155,7 +157,7 @@ class TbFormInputElement extends \CFormElement {
 
 		$options = array();
 		$fields = array('widgetOptions', 'label', 'labelOptions', 'errorOptions', 'hint', 'hintOptions', 'prepend', 'prependOptions',
-			'append', 'appendOptions', 'enableAjaxValidation', 'enableClientValidation');
+			'append', 'appendOptions', 'enableAjaxValidation', 'groupOptions', 'enableClientValidation');
 		foreach ($fields as $prop) {
 			$options[$prop] = $this->$prop;
 		}
@@ -176,7 +178,7 @@ class TbFormInputElement extends \CFormElement {
 
 		if (isset(self::$inputTypes[$this->type])) {
 			$method = self::$inputTypes[$this->type];
-			return $this->getParent()->getActiveFormWidget()->$method($model, $attribute, $this->attributes, $options);
+			return $this->getParent()->getActiveFormWidget()->$method($model, $attribute, $options);
 		} else {
 			$attributes = $this->attributes;
 			$attributes['model'] = $model;
