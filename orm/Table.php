@@ -52,9 +52,14 @@ final class Table extends \CComponent implements Annotation
 	private $identifierType;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
-	private $extra = array();
+	private $engine = null;
+
+	/**
+	 * @var string
+	 */
+	private $charset = null;
 
 	/**
 	 *
@@ -221,27 +226,6 @@ final class Table extends \CComponent implements Annotation
 	/**
 	 * @return bool
 	 */
-	public function isExtra( $name )
-	{
-		return isset($this->extra[$name]);
-	}
-
-	/**
-	 * @param string $name
-	 *
-	 * @throws \CException
-	 */
-	public function addExtra( $name ) {
-		if( count($this->extra) ) {
-			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" already have @Id field.',array('{name}' => $this->rawName)));
-		}
-
-		$this->extra[$name] = true;
-	}
-
-	/**
-	 * @return bool
-	 */
 	public function getIsPrimaryKeyComposite()
 	{
 		return count( $this->primaryKey->columns ) > 1;
@@ -319,6 +303,39 @@ final class Table extends \CComponent implements Annotation
 	{
 		return $this->schemaName;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getCharset()
+	{
+		return $this->charset;
+	}
+
+	/**
+	 * @param string $charset
+	 */
+	public function setCharset( $charset )
+	{
+		$this->charset = $charset;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getEngine()
+	{
+		return $this->engine;
+	}
+
+	/**
+	 * @param string $engine
+	 */
+	public function setEngine( $engine )
+	{
+		$this->engine = $engine;
+	}
+
 
 	/**
 	 * @throws \CException

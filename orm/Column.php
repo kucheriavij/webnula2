@@ -59,6 +59,11 @@ final class Column extends \CComponent implements Annotation
 	private $table;
 
 	/**
+	 * @var bool
+	 */
+	private $auto_increment = false;
+
+	/**
 	 * @return string
 	 */
 	public function getCharset()
@@ -227,12 +232,32 @@ final class Column extends \CComponent implements Annotation
 	}
 
 	/**
+	 * @param bool $value
+	 */
+	public function setAutoIncrement($value)
+	{
+		$this->auto_increment = $value;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAutoIncrement()
+	{
+		return $this->auto_increment;
+	}
+
+	/**
 	 * @throws \CException
 	 */
 	function validate()
 	{
 		if( empty($this->type) ) {
 			throw new \CException(\Yii::t('webnula2.locale', 'Type cannot be empty.'));
+		}
+
+		if( $this->auto_increment && $this->type !== 'integer' ) {
+			throw new \CException(\Yii::t('webnula2.locale', 'Only integer type should be auto_increment.'));
 		}
 	}
 }

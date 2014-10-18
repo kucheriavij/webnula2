@@ -23,6 +23,25 @@ use webnula2\orm\TableDiff;
 final class MysqlPlatform extends AbstractPlatform
 {
 	/**
+	 * @var string
+	 */
+	private $defaultEngine = 'innodb';
+	/**
+	 * @var string
+	 */
+	private $defaultCharset = 'utf8';
+
+	/**
+	 * @var array
+	 */
+	private $engines = array();
+
+	/**
+	 * @var array
+	 */
+	private $charsets = array();
+
+	/**
 	 * @var array
 	 */
 	private $types = array(
@@ -39,6 +58,34 @@ final class MysqlPlatform extends AbstractPlatform
 		'time' => 'TIME',
 		'binary' => 'LONGBLOB',
 	);
+
+	/**
+	 *
+	 */
+	public function __construct()
+	{
+		$db = \Yii::app()->getDb();
+		$rows = $db->createCommand( 'SELECT * FROM `information_schema`.`ENGINES`' )->queryAll();
+
+		foreach ( $rows as $row ) {
+			$key = strtolower($row['ENGINE']);
+			$this->engines[$key] = array(
+				'name' => $row['ENGINE'],
+				'supportForeignKeys' => in_array($key, array('innodb'), true),
+				'transactions' => $row['TRANSACTIONS'] === 'YES' ?: false,
+				'support' => $row['SUPPORT'] === 'YES' || $row['SUPPORT'] === 'DEFAULT' ?: false
+			);
+		}
+
+		$rows = $db->createCommand('SELECT * FROM `information_schema`.`CHARACTER_SETS`')->queryAll();
+		foreach( $rows as $row ) {
+			$key = strtolower($row['CHARACTER_SET_NAME']);
+			$this->charsets[$key] = array(
+				'name' => $row['CHARACTER_SET_NAME'],
+				'collate'=> $row['DEFAULT_COLLATE_NAME'],
+			);
+		}
+	}
 
 	/**
 	 * @param Column $column
@@ -65,7 +112,33 @@ final class MysqlPlatform extends AbstractPlatform
 	 */
 	function getPkType()
 	{
-		return 'int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY';
+		return 'int(11) NOT NULL AUTO_INCREMENT';
+	}
+
+	/**
+	 * @param Table $table
+	 *
+	 * @return mixed
+	 */
+	public function getEngine(Table $table) {
+		if( isset($table->engine) && isset($this->engines[$table->engine]) ) {
+			return $this->engines[$table->engine];
+		} else {
+			return $this->engines[$this->defaultEngine];
+		}
+	}
+
+	/**
+	 * @param Table $table
+	 *
+	 * @return mixed
+	 */
+	public function getCharset( Table $table ) {
+		if( isset($table->charset) && isset($this->charsets[$table->charset]) ) {
+			return $this->charsets[$table->charset];
+		} else {
+			return $this->charsets[$this->defaultCharset];
+		}
 	}
 
 	/**
@@ -78,14 +151,19 @@ final class MysqlPlatform extends AbstractPlatform
 		$columnList = $this->getColumnDeclarationListSQL( $table );
 		$name = $table->rawName;
 
-		$query = 'CREATE TABLE ' . $name . "(\n" . $columnList . ") ";
-		$query .= 'Engine=InnoDb CHARSET=utf8';
+		$query = 'CREATE TABLE ' . $name . "(\n" . $columnList;
 
-		$sql = array( $query );
-		if ( !empty( $table->primaryKeys ) ) {
-			$sql[] = $this->addPrimaryKeys( $table );
+
+		if ( !$table->getPrimaryKeys()->IsEmpty ) {
+			$query .= ",\nPRIMARY KEY(`".implode('`, `', $table->getPrimaryKeys()->getColumns())."`)";
 		}
 
+		$engine = $this->getEngine( $table );
+		$charset = $this->getCharset( $table );
+
+		$query .= strtr(') Engine={engine} CHARSET={charset}', array('{engine}'=>$engine['name'], '{charset}' => $charset['name']));
+
+		$sql = array( $query );
 		foreach ( $table->getIndexes() as $index ) {
 			$sql[] = $this->addIndex( $index, $table );
 		}
@@ -176,6 +254,17 @@ final class MysqlPlatform extends AbstractPlatform
 		return 'ALTER TABLE ' . $pk->table->rawName . ' DROP PRIMARY KEY';
 	}
 
+	/**
+	 * @param Table $table
+	 *
+	 * @throws \CException
+	 */
+	public function checkSupportForeignKey( Table $table ) {
+		$engine = $this->getEngine($table);
+		if( !$engine['supportForeignKeys'] ) {
+			throw new \CException(\Yii::t('webnula2.locale', 'Table "{name}" with engine type "{engine}" does not support foreign keys.'));
+		}
+	}
 
 	/**
 	 * @param ForeignKey $fk
@@ -191,6 +280,8 @@ final class MysqlPlatform extends AbstractPlatform
 		$refColumns = $fk->getReferences();
 		foreach ( $refColumns as $i => $col )
 			$refColumns[$i] = $this->quoteName( $col );
+
+		$this->checkSupportForeignKey($table);
 
 		$sql = 'ALTER TABLE ' . $table->rawName
 			. ' ADD CONSTRAINT ' . $this->quoteName( $fk->name )
@@ -213,6 +304,8 @@ final class MysqlPlatform extends AbstractPlatform
 	 */
 	function dropForeignKey( ForeignKey $fk, Table $table )
 	{
+		$this->checkSupportForeignKey($table);
+
 		return 'ALTER TABLE ' . $table->rawName
 		. ' DROP FOREIGN KEY ' . $this->quoteName( $fk->name );
 	}
