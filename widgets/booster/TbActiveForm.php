@@ -786,6 +786,31 @@ class TbActiveForm extends \CActiveForm
 	}
 
 	/**
+	 * Generates a file view/upload group for a model attribute
+	 *
+	 * @param $model
+	 * @param $attribute
+	 * @param $options
+	 *
+	 * @return string
+	 */
+	public function filesFieldGroup($model, $attribute, $options)
+	{
+		return $this->widgetGroupInternal('webnula2\widgets\File', $model, $attribute, $options);
+	}
+
+	/**
+	 * Generates a image view/upload group for a model attribute
+	 * @param $model
+	 * @param $attribute
+	 * @param $options
+	 */
+	public function imagesFieldGroup($model, $attribute, $options)
+	{
+		$this->widgetGroupInternal('webnula2\widgets\Image', $model, $attribute, $options);
+	}
+
+	/**
 	 * Generates a date range picker group for a model attribute.
 	 *
 	 * This method is a wrapper for {@link TbDateRangePicker} widget and {@link customFieldGroup}.
@@ -989,8 +1014,8 @@ class TbActiveForm extends \CActiveForm
 	/**
 	 * Generates a widget group for a model attribute.
 	 *
-	 * This method is a wrapper for {@link \CBaseController::widget} and {@link customFieldGroup}.
-	 * Read detailed information about $widgetOptions in $properties argument of {@link \CBaseController::widget} method.
+	 * This method is a wrapper for {@link CBaseController::widget} and {@link customFieldGroup}.
+	 * Read detailed information about $widgetOptions in $properties argument of {@link CBaseController::widget} method.
 	 * About $options argument parameters see {@link TbActiveForm} documentation.
 	 *
 	 * @param string $className The widget class name or class in dot syntax (e.g. application.widgets.MyWidget).
@@ -998,12 +1023,19 @@ class TbActiveForm extends \CActiveForm
 	 * @param string $attribute The attribute.
 	 * @param array $options List of initial property values for the group (Property Name => Property Value).
 	 * @return string The generated widget group.
-	 * @see \CBaseController::widget
+	 * @see CBaseController::widget
 	 * @see customFieldGroup
 	 */
 	public function widgetGroup($className, $model, $attribute, $options = array()) {
 
-		return $this->widgetGroupInternal($className, $model, $attribute, $options);
+		$this->initOptions($options);
+		$widgetOptions = isset($options['widgetOptions']) ? $options['widgetOptions'] : null;
+
+		$this->addCssClass($widgetOptions['htmlOptions'], 'form-control');
+
+		$fieldData = array(array($this->owner, 'widget'), array($className, $widgetOptions, true));
+
+		return $this->customFieldGroupInternal($fieldData, $model, $attribute, $options);
 	}
 
 	/**
@@ -1012,10 +1044,12 @@ class TbActiveForm extends \CActiveForm
 	 * @param string $className The widget class name or class in dot syntax (e.g. application.widgets.MyWidget).
 	 * @param CModel $model The data model.
 	 * @param string $attribute The attribute.
+	 * @param array $widgetOptions List of initial property values for the widget (Property Name => Property Value).
 	 * @param array $options Group attributes.
 	 * @return string The generated widget group.
 	 */
 	protected function widgetGroupInternal($className, &$model, &$attribute, &$options) {
+		// if(empty($options['widgetOptions']['mask'])) exit;
 		$this->initOptions($options);
 		$widgetOptions = $options['widgetOptions'];
 		$widgetOptions['model'] = $model;

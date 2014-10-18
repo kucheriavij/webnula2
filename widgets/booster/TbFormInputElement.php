@@ -3,7 +3,7 @@
 namespace webnula2\widgets\booster;
 
 class TbFormInputElement extends \CFormElement {
-	
+
 	/**
 	 * Input types (alias => TbActiveForm method name).
 	 * @var array
@@ -15,6 +15,8 @@ class TbFormInputElement extends \CFormElement {
 		'password' => 'passwordFieldGroup',
 		'textarea' => 'textAreaGroup',
 		'file' => 'fileFieldGroup',
+		'files' => 'filesFieldGroup',
+		'images' => 'imagesFieldGroup',
 		'radio' => 'radioButtonGroup',
 		'checkbox' => 'checkBoxGroup',
 		'listbox' => 'listBoxGroup',
@@ -42,7 +44,7 @@ class TbFormInputElement extends \CFormElement {
 		//'captcha' => 'captchaGroup',
 		'pass' => 'passFieldGroup'
 	);
-	
+
 	public $widgetOptions = array();
 
 	/**
@@ -150,7 +152,7 @@ class TbFormInputElement extends \CFormElement {
 	 * @return array The row options.
 	 */
 	protected function generateGroupOptions() {
-		
+
 		$options = array();
 		$fields = array('widgetOptions', 'label', 'labelOptions', 'errorOptions', 'hint', 'hintOptions', 'prepend', 'prependOptions',
 			'append', 'appendOptions', 'enableAjaxValidation', 'enableClientValidation');
@@ -168,24 +170,17 @@ class TbFormInputElement extends \CFormElement {
 	 * @return string The rendered element.
 	 */
 	public function render() {
-		
 		$model = $this->getParent()->getModel();
 		$attribute = $this->name;
 		$options = $this->generateGroupOptions();
 
 		if (isset(self::$inputTypes[$this->type])) {
 			$method = self::$inputTypes[$this->type];
-			switch( $this->type ) {
-				case 'hidden':
-					return $this->getParent()->getActiveFormWidget()->$method($model, $attribute, $this->attributes);
-				default:
-					$options= array_merge($this->attributes, $options);
-					return $this->getParent()->getActiveFormWidget()->$method($model, $attribute, $options);
-			}
+			return $this->getParent()->getActiveFormWidget()->$method($model, $attribute, $this->attributes, $options);
 		} else {
 			$attributes = $this->attributes;
-			$attributes['model'] = $this->getParent()->getModel();
-			$attributes['attribute'] = $this->name;
+			$attributes['model'] = $model;
+			$attributes['attribute'] = $attribute;
 
 			return $this->getParent()->getActiveFormWidget()->customFieldGroup(
 				array(array($this->getParent()->getOwner(), 'widget'), array($this->type, $attributes, true)),
@@ -202,7 +197,7 @@ class TbFormInputElement extends \CFormElement {
 	 * @return bool Whether this element is visible.
 	 */
 	protected function evaluateVisible() {
-		
+
 		return $this->getParent()->getModel()->isAttributeSafe($this->name);
 	}
 }
