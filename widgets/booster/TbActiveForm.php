@@ -380,6 +380,27 @@ class TbActiveForm extends \CActiveForm
 	 * @see \CActiveForm::textField
 	 * @see customFieldGroup
 	 */
+	public function hiddenFieldGroup($model, $attribute, $options = array()) {
+		$this->initOptions($options);
+		$widgetOptions = $options['widgetOptions'];
+
+		return $this->hiddenField( $model, $attribute, $widgetOptions['htmlOptions']);
+	}
+
+	/**
+	 * Generates a text field group for a model attribute.
+	 *
+	 * This method is a wrapper for {@link \CActiveForm::textField} and {@link customFieldGroup}.
+	 * Please check {@link \CActiveForm::textField} for detailed information about $htmlOptions argument.
+	 * About $options argument parameters see {@link TbActiveForm} documentation.
+	 *
+	 * @param CModel $model The data model.
+	 * @param string $attribute The attribute.
+	 * @param array $options Group attributes.
+	 * @return string The generated text field group.
+	 * @see \CActiveForm::textField
+	 * @see customFieldGroup
+	 */
 	public function textFieldGroup($model, $attribute, $options = array()) {
 		$this->initOptions($options);
 		$widgetOptions = $options['widgetOptions'];

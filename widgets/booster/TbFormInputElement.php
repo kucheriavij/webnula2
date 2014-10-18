@@ -11,7 +11,7 @@ class TbFormInputElement extends \CFormElement {
 	public static $inputTypes = array(
 		// standard fields
 		'text' => 'textFieldGroup',
-		'hidden' => 'hiddenField',
+		'hidden' => 'hiddenFieldGroup',
 		'password' => 'passwordFieldGroup',
 		'textarea' => 'textAreaGroup',
 		'file' => 'fileFieldGroup',
