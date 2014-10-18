@@ -78,7 +78,7 @@ class SortableColumn extends \CGridColumn {
 	function() {
 		var tr = $(this).parents('tr');
 		var myid = tr.attr('id');
-
+		alert($(this).attr('dir'))
 		$.fn.yiiGridView.update('{$this->grid->id}', {
 			type:'POST',
 			url:tr.attr('href'),
