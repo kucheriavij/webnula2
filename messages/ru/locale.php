@@ -15,7 +15,7 @@ return array(
 	'Create section' => 'Добавить раздел',
 	'Update section #{id}' => 'Редактировать раздел #{id}',
 	'Save' => 'Сохранить',
-	'Route' => 'Тип страницы',
+	'Route' => 'Обработчик',
 	'Default' => 'По умолчанию',
 	'Url' => 'Адрес',
 	'Cancel' => 'Отмена',

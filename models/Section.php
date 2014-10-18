@@ -37,6 +37,10 @@ class Section extends Entity
 	 */
 	public $children = array();
 	/**
+	 * @var bool
+	 */
+	public $hasChildren = false;
+	/**
 	 * @Id
 	 * @Column(type="integer")
 	 */
@@ -380,8 +384,14 @@ class Section extends Entity
 					'type' => 'checkbox',
 				),
 				'route' => array(
-					'type' => 'dropdownlist',
-					'items' => $this->route()
+					'type' => 'listbox',
+					'items' => $this->route(),
+					'widgetOptions' => array(
+						'htmlOptions' => array(
+							'size' => 10,
+							'multiple' => false
+						)
+					)
 				),
 				'r_url' => array(
 					'type' => 'text'
