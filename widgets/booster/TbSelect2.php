@@ -7,6 +7,9 @@
  * @license [New BSD License](http://www.opensource.org/licenses/bsd-license.php)
  */
 
+namespace webnula2\widgets\booster;
+use webnula2\components\Booster;
+
 /**
  *## Select2 wrapper widget
  *
