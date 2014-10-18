@@ -66,6 +66,14 @@ class SortableColumn extends \CGridColumn {
 				$this->template = '{drag}';
 				\Yii::app()->getClientScript()->registerScript( __CLASS__ . '#' . $this->grid->controller->id, "$.fn.yiiGridView.sortable('{$this->grid->id}', null, $csrf);" );
 			} else {
+				if ( \Yii::app()->request->enableCsrfValidation ) {
+					$csrfTokenName = \Yii::app()->request->csrfTokenName;
+					$csrfToken = \Yii::app()->request->csrfToken;
+					$csrf = "'$csrfTokenName':'$csrfToken'";
+				} else {
+					$csrf = '';
+				}
+
 				$function = \CJavaScript::encode( "js:
 	function() {
 		var tr = $(this).parents('tr');
@@ -74,7 +82,7 @@ class SortableColumn extends \CGridColumn {
 		$.fn.yiiGridView.update('{$this->grid->id}', {
 			type:'POST',
 			url:tr.attr('href'),
-			data : { id : myid, position : $(this).attr('dir') },
+			data : { id:myid, position:$(this).attr('dir'),{$csrf}},
 			success:function(data) {
 				$.fn.yiiGridView.update('{$this->grid->id}');
 			}
@@ -82,7 +90,7 @@ class SortableColumn extends \CGridColumn {
 		return false;
 	}
 	" );
-				\Yii::app()->getClientScript()->registerScript( __CLASS__ . '#' . $this->grid->id, "jQuery(document).on('click', '#{$this->grid->id} .sortable-column a', {$function})" );
+				\Yii::app()->getClientScript()->registerScript( __CLASS__ . '#' . $this->grid->controller->id, "jQuery(document).on('click', '#{$this->grid->id} .sortable-column a', {$function})" );
 			}
 		}
 	}
@@ -132,7 +140,9 @@ class SortableColumn extends \CGridColumn {
 			$options['title'] = $label;
 		}
 
-		$options['dir'] = $button['dir'];
+		if (!isset($options['data-toggle'])) {
+			$options['data-toggle'] = 'tooltip';
+		}
 
 		if (isset($button['icon']) && $button['icon']) {
 			if (strpos($button['icon'], 'icon') === false && strpos($button['icon'], 'fa') === false) {
