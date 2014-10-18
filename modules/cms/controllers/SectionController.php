@@ -112,7 +112,7 @@ class SectionController extends Controller
 	{
 		if ( isset( $_GET['root'] ) ) {
 			$command = \Yii::app()->getDb()->createCommand();
-			$nodes = $command->select( 'm1.id, m1.url, m1.parent_id, m1.level, m1.title AS text, m2.id IS NOT NULL AS hasChildren' )
+			$nodes = $command->select( 'm1.id, m1.uuid, m1.parent_id, m1.level, m1.title AS text, m2.id IS NOT NULL AS hasChildren' )
 				->from( '{{section}} AS m1' )
 				->leftJoin( '{{section}} AS m2', ' m1.id=m2.parent_id' )
 				->where( 'm1.parent_id = ?', array( (int)$_GET['root'] ) )
@@ -121,8 +121,8 @@ class SectionController extends Controller
 			$nodes = $command->queryAll();
 
 			foreach ( $nodes as &$node ) {
-				$node['text'] = \CHtml::link( $node['text'], array( 'index', 'id' => $node['id'] ) );
-				unset( $node['url'] );
+				$node['text'] = \CHtml::link( $node['text'], array( 'index', 'uuid' => $node['uuid'] ) );
+				unset( $node['uuid'] );
 
 				$node['hasChildren'] = (bool)$node['IS NOT NULL AS hasChildren'];
 				unset( $node['IS NOT NULL AS hasChildren'] );
