@@ -83,14 +83,11 @@ final class UrlManager extends \CApplicationComponent
 	protected function processRules()
 	{
 		if ( $this->cacheID !== false && ( $cache = \Yii::app()->getComponent( $this->cacheID ) ) !== null ) {
-		//	$hash = md5( serialize( $this->rules ) );
-			if ( ( $data = $cache->get( self::CACHE_KEY ) ) !== false /*&& isset( $data[1] ) && $data[1] === $hash */) {
-				$this->_rules = $data;//$data[0];
-
+			if ( ( $data = $cache->get( self::CACHE_KEY ) ) !== false ) {
+				$this->_rules = $data;
 				return;
 			}
 		}
-
 		$this->applyRules(\Yii::app()->getModules());
 
 		if ( isset( $cache ) )
@@ -334,11 +331,16 @@ final class UrlManager extends \CApplicationComponent
 		}
 		$segments[] = '/';
 
+
 		$criteria = new \CDbCriteria();
+		$criteria->compare('publish', 1);
+		$criteria->order = 'level DESC, left_key DESC';
 		$criteria->addInCondition( 'url', $segments );
+
 		if ( null !== $section = Section::model()->find( $criteria ) ) {
-			$this->getParams()->add('routeInfo', str_replace($section->url, '/', $pathInfo));
+			$this->getParams()->add('routeInfo', str_replace($section->url, '/', '/'.$rawPathInfo.'/'));
 			$this->getParams()->add('section', $section);
+
 			if( !empty($section->r_url) ) {
 				\Yii::app()->getRequest()->redirect($section->r_url);
 			}
