@@ -7,6 +7,7 @@
  */
 
 namespace webnula2\models;
+use webnula2\components\Kernel;
 
 
 /**
@@ -198,7 +199,12 @@ class Section extends Entity
 	 */
 	public function behaviors()
 	{
-		return array(
+		$behaviors = array();
+		if( isset(Kernel::get()->behaviors['section']) ) {
+			$behaviors = (array)Kernel::get()->behaviors['section'];
+			//settype($behaviors, 'array');
+		}
+		return array_merge($behaviors, array(
 			'nestedset' => array(
 				'class' => 'webnula2.extensions.NestedSetBehavior',
 				'hasManyRoots' => true,
@@ -209,7 +215,7 @@ class Section extends Entity
 			'ar-relation' => array(
 				'class' => 'webnula2.extensions.EActiveRecordRelationBehavior'
 			)
-		);
+		));
 	}
 
 	/**
@@ -217,7 +223,13 @@ class Section extends Entity
 	 */
 	public function relations()
 	{
-		return array(
+		$relations = array();
+		if( isset(Kernel::get()->relations['section']) ) {
+			$relations = (array)Kernel::get()->relations['section'];
+			//settype($relations, 'array');
+		}
+
+		return $relations + array(
 			'access' => array( self::MANY_MANY, 'webnula2\models\AuthItem', '{{section_access}}(section_id, itemname)' ),
 			'menu' => array(self::MANY_MANY, 'webnula2\models\Menu', '{{section_menu}}(section_id, menu_id)'),
 		);
@@ -384,14 +396,8 @@ class Section extends Entity
 					'type' => 'checkbox',
 				),
 				'route' => array(
-					'type' => 'listbox',
-					'items' => $this->route(),
-					'widgetOptions' => array(
-						'htmlOptions' => array(
-							'size' => 10,
-							'multiple' => false
-						)
-					)
+					'type' => 'dropdownlist',
+					'items' => $this->route()
 				),
 				'r_url' => array(
 					'type' => 'text'

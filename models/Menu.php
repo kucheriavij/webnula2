@@ -5,6 +5,7 @@
  * @license LICENSE
  */
 namespace webnula2\models;
+use webnula2\components\Kernel;
 
 /**
  * Class Menu
@@ -160,9 +161,21 @@ class Menu extends Entity {
 	 */
 	public function behaviors()
 	{
-		if( isset(\Yii::app()->getComponent('webnula2')->behaviors['menu']) ) {
-			return \Yii::app()->getComponent('webnula2')->behaviors['menu'];
+		if( isset(Kernel::get()->behaviors['menu']) ) {
+			return Kernel::get()->behaviors['menu'];
 		}
+		return array();
+	}
+
+	/**
+	 * @return array
+	 */
+	public function relations()
+	{
+		if( isset(Kernel::get()->relations['menu']) ) {
+			return (array)Kernel::get()->relations['menu'];
+		}
+		return array();
 	}
 
 	/**

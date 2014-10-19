@@ -5,6 +5,7 @@
  * @license LICENSE
  */
 namespace webnula2\models;
+use webnula2\components\Kernel;
 
 
 /**
@@ -135,17 +136,29 @@ class User extends Entity
 	 */
 	public function relations()
 	{
-		return array(
+		$relations = array();
+		if( isset(Kernel::get()->relations['user']) ) {
+			$relations = (array)Kernel::get()->relations['user'];
+			//settype($relations, 'array');
+		}
+
+		return $relations + array(
 			'groups' => array( self::MANY_MANY, 'webnula2\models\AuthItem', '{{authassignment}}(userid, itemname)' )
 		);
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	public function behaviors()
 	{
-		return array(
+		$behaviors = array();
+		if( isset(Kernel::get()->relations['user']) ) {
+			$behaviors = (array)Kernel::get()->relations['user'];
+			//settype($behaviors, 'array');
+		}
+
+		return $behaviors+ array(
 			'ar-relation' => 'webnula2.extensions.EActiveRecordRelationBehavior',
 		);
 	}
