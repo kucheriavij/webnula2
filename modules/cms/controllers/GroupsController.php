@@ -110,9 +110,12 @@ class GroupsController extends Controller
 	}
 
 	/**
+	 * @param $name
+	 *
+	 * @throws \CDbException
 	 * @throws \CHttpException
 	 */
-	public function actionDelete()
+	public function actionDelete( $name )
 	{
 		$this->loadModel( $name )->delete();
 	}
