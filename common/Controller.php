@@ -22,7 +22,7 @@ class Controller extends \CController {
 	 */
 	public $actions = array();
 	/**
-	 * @var CAttributeCollection
+	 * @var \CAttributeCollection
 	 */
 	public $params;
 
@@ -147,11 +147,10 @@ class Controller extends \CController {
 	private function processRules()
 	{
 		$rules = $this->route();
-
-		if( ($cache=\Yii::app()->getComponent('cache')) !== null )
+		if( $cache = \Yii::app()->getComponent('cache') )
 		{
 			$hash=md5(serialize($rules));
-			if( ($data=$cache->get($this->cacheKey)) !== false && isset($data[1]) && $data[1]===$hash )
+			if( ($data=$cache->get(get_class($this))) !== false && isset($data[1]) && $data[1]===$hash )
 			{
 				$this->rules=$data[0];
 				return;
@@ -168,7 +167,7 @@ class Controller extends \CController {
 			}
 		}
 		if(isset($cache))
-			$cache->set($this->cacheKey,array($this->rules,$hash));
+			$cache->set(get_class($this),array($this->rules,$hash));
 	}
 
 	/**
@@ -177,18 +176,19 @@ class Controller extends \CController {
 	public function run($actionID)
 	{
 		$rawPathInfo = $this->params['routeInfo'];
-
-		if( !empty($this->_rules) ) {
-			if( is_string($this->_rules) )
-				$actionID = $this->_rules;
+		if( !empty($this->rules) ) {
+			if( is_string($this->rules) )
+				$actionID = $this->rules;
 			else {
 				$manager = \Yii::app()->getUrlManager();
 				$request = \Yii::app()->getRequest();
 				$pathInfo = trim($rawPathInfo, '/');
 
-				foreach($this->_rules as $rule) {
-					if(($actionID = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo)))
+				foreach($this->rules as $rule) {
+					if(($actionID = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo))) {
+						$this->params->mergeWith($_GET);
 						break;
+					}
 				}
 			}
 		} else {
