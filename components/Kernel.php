@@ -120,7 +120,7 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 
 			$this->cs = $Yii->getClientScript();
 
-			$this->processAssets($Yii);
+			$this->prepare($Yii);
 
 			$Yii->viewRenderer->assign(array(
 				'kernel' => $this,
@@ -128,11 +128,10 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 		}
 	}
 
-	/**
-	 * @param \CWebApplication $Yii
-	 */
-	private function processAssets($Yii)
+	private function prepare(\CWebApplication $Yii)
 	{
+		$modules = $Yii->getModules();
+
 		$this->assets['app'] = ( YII_DEBUG ?
 			$Yii->getAssetManager()->publish( \Yii::getPathOfAlias('application.assets'), false, -1, true ) :
 			$Yii->getAssetManager()->publish( \Yii::getPathOfAlias('application.assets') )
@@ -140,8 +139,6 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 
 		$packages = \Yii::getPathOfAlias('application.config.packages');
 		$packages = include $packages.'.php';
-
-		$modules = \Yii::app()->getModules();
 
 		foreach ( $packages as $name => $definition ) {
 			$preload = isset( $definition['preload'] ) && $definition['preload'] === true;
@@ -162,6 +159,12 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 			if ( $preload )
 				$this->cs->registerPackage( $name );
 			$packages[$name] = $definition;
+		}
+
+		foreach( $modules as $id => $config )
+		{
+			$basePath = dirname(\Yii::getPathOfAlias(str_replace('\\', '.', $config['class'])));
+			\Yii::setPathOfAlias("$id", $basePath);
 		}
 	}
 

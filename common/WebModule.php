@@ -44,7 +44,7 @@ abstract class WebModule extends \CWebModule {
 	 */
 	protected function init()
 	{
-		$this->cs = \Yii::app()->getClientScript();
+		$this->cs = \Yii::app()->clientScript;
 
 		if( ($assetsPath = \Yii::getPathOfAlias($this->getId().'.assets')) && is_dir($assetsPath)) {
 			$this->_assetsUrl = ( YII_DEBUG ?
