@@ -6,6 +6,7 @@
  */
 
 namespace webnula2\common;
+use webnula2\components\Kernel;
 
 
 /**
@@ -34,15 +35,21 @@ abstract class WebModule extends \CWebModule {
 	public $cs;
 
 	/**
+	 * @var array
+	 */
+	public $packages = array();
+
+	/**
 	 *
 	 */
 	protected function init()
 	{
 		$this->cs = \Yii::app()->getClientScript();
-		if( is_dir($this->getBasePath().'/assets') ) {
+
+		if( ($assetsPath = \Yii::getPathOfAlias($this->getId().'.assets')) && is_dir($assetsPath)) {
 			$this->_assetsUrl = ( YII_DEBUG ?
-				\Yii::app()->getAssetManager()->publish( $this->getBasePath() . '/assets', false, -1, true ) :
-				\Yii::app()->getAssetManager()->publish( $this->getBasePath() . '/assets' )
+				\Yii::app()->getAssetManager()->publish( $assetsPath, false, -1, true ) :
+				\Yii::app()->getAssetManager()->publish( $assetsPath )
 			);
 		}
 	}

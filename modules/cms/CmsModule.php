@@ -8,6 +8,7 @@ namespace webnula2\modules\cms;
 
 
 use webnula2\common\WebModule;
+use webnula2\components\Kernel;
 
 /**
  * Class CmsModule
@@ -44,6 +45,11 @@ class CmsModule extends WebModule
 	 * @var array
 	 */
 	public $models = array();
+	/**
+	 * @var
+	 */
+	private $assetsUrl;
+
 	/**
 	 * @var array
 	 */
@@ -98,13 +104,14 @@ class CmsModule extends WebModule
 
 		$this->cs = \Yii::app()->getClientScript();
 
-		$packages = require_once dirname(__FILE__).'/packages.php';
-		foreach ( $packages as $name => $definition ) {
-			$this->cs->addPackage( $name, $definition );
-			$this->cs->registerPackage($name);
-		}
-
 		\Yii::setPathOfAlias( 'cms@layouts', $this->getViewPath() . '/layouts' );
+
+		if(is_array($packages = include dirname(__FILE__).'/packages.php')) {
+			foreach ( $packages as $name => $definition ) {
+				$this->cs->addPackage( $name, $definition );
+				$this->cs->registerPackage( $name );
+			}
+		}
 
 		\Yii::app()->viewRenderer->assign( array(
 			'cms' => $this,
