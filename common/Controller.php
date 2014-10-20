@@ -49,6 +49,8 @@ class Controller extends \CController {
 		$this->params = \Yii::app()->urlManager->getParams();
 		$this->processRules();
 
+		$this->cs = \Yii::app()->getClientScript();
+
 		if( ($assetsPath = \Yii::getPathOfAlias('application.assets')) && is_dir($assetsPath)) {
 			$this->assetsUrl = ( YII_DEBUG ?
 				\Yii::app()->getAssetManager()->publish( $assetsPath, false, -1, true ) :
