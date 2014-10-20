@@ -470,6 +470,9 @@ class Section extends Entity
 
 				if ( !empty( $config['controllerMap'] ) ) {
 					foreach ( $config['controllerMap'] as $c_id => $c_config ) {
+						if( isset($c_config['exclude']) && $c_config['exclude'] === true ) {
+							continue;
+						}
 						$route[$c_config['title']] = array();
 						$r = $id . '/' . $c_id;
 						if ( !empty( $c_config['actions'] ) && is_array( $c_config['actions'] ) ) {
