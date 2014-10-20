@@ -20,7 +20,8 @@ class DefaultController extends Controller
 	public function filters()
 	{
 		return array(
-			'accessControl'
+			'accessControl',
+			'postOnly + cache'
 		);
 	}
 
@@ -31,7 +32,7 @@ class DefaultController extends Controller
 	{
 		return array(
 			array( 'allow',
-				'actions' => array( 'error' ),
+				'actions' => array( 'error', 'cache' ),
 				'roles' => array( 'Administrator' ) ),
 			array( 'deny' )
 		);
@@ -47,6 +48,13 @@ class DefaultController extends Controller
 				echo $error['message'];
 			else
 				$this->render( 'error', $error );
+		}
+	}
+
+	public function actionCache()
+	{
+		if( $cache =  \Yii::app()->getComponent('cache') ) {
+			$cache->flush();
 		}
 	}
 } 

@@ -55,15 +55,6 @@ class Controller extends \CController {
 				\Yii::app()->getAssetManager()->publish( $assetsPath )
 			);
 		}
-
-		$this->cs = \Yii::app()->getClientScript();
-		if(($packages = \Yii::getPathOfAlias('application.config.packages')) && is_file($packages.'.php')) {
-			$packages = (array)require_once $packages.'.php';
-			foreach( $packages as $name => $package ) {
-				$this->cs->addPackage($name, $package);
-				$this->cs->registerPackage($name);
-			}
-		}
 	}
 
 	/**
@@ -85,6 +76,14 @@ class Controller extends \CController {
 	 */
 	public function registerCoreScript($coreName) {
 		$this->cs->registerCoreScript($coreName);
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function registerPackage($name)
+	{
+		$this->cs->registerPackage($name);
 	}
 
 	/**

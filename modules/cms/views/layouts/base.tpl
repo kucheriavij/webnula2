@@ -14,12 +14,20 @@
 'fluid' => true,
 'items' => [
 ['class' => 'webnula2\widgets\booster\TbMenu', 'type' => 'navbar', 'items' => $cms->menuItems()],
-['class' => 'webnula2\widgets\booster\TbButtonGroup', 'htmlOptions' => ['class' => 'pull-right', 'style'=>'margin: 7.5px 0'], 'buttonType' => 'link', 'buttons' => [
-['label' => $Yii->getUser()->get('username'), 'url' => ['user/update', 'id' => $Yii->getUser()->getId()]],
-['icon' => 'off', 'url' => ['auth/logout']]
-]]
+['class' => 'webnula2\widgets\booster\TbButtonGroup', 'htmlOptions' => ['class' => 'pull-right', 'style'=>'margin: 7.5px 0'],
+'buttonType' => 'link',
+'buttons' => [['label' => $Yii->getUser()->get('username'), 'url' => ['user/update', 'id' => $Yii->getUser()->getId()]],
+['icon' => 'off', 'url' => ['auth/logout']]]],
+['class' => 'webnula2\widgets\booster\TbButton',
+'icon' => 'refresh',
+'buttonType' =>'ajaxButton',
+'context' => 'info',
+'ajaxOptions' => ['type' => 'POST', 'success' => "js: function() { \$('.top-right').notify({ message: { text: '{$cms->t('Cache cleared.')}' }}).show(); }"],
+'htmlOptions' => ['title' => $cms->t('Clear cache'), 'id' => 'clearcache', 'class' => 'pull-right', 'style'=>'margin: 7.5px 30px 0 0'],
+'url' => '/cms/default/cache/']
 ]
 ], true)}
+<div class='notifications top-right'></div>
 <div class="container-fluid">
 	<div class="row">
 		{block 'structure'}

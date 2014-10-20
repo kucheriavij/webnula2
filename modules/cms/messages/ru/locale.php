@@ -35,6 +35,8 @@ return array(
 	'Delete' => 'Удалить',
 	'Menu' => 'Меню',
 	'Main' => 'Главная',
+	'Clear cache' => 'Сбросить кэш',
+	'Cache cleared.' => 'Кэш сброшен.',
 	'Management users' => 'Управление пользователями',
 	'Object #{id} not found.' => 'Объект #{id} не найден.'
 );
