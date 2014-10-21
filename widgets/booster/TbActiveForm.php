@@ -800,6 +800,9 @@ class TbActiveForm extends \CActiveForm
 		$options['widgetOptions'] = array_merge(array(
 			'compressorRoute' => '/cms/tinymce/compressor',
 			'spellcheckerUrl' => 'http://speller.yandex.net/services/tinyspell',
+			'settings' => array(
+				'style_formats' => !empty(\Yii::app()->params->styles) ? \Yii::app()->params->styles : array(),
+			),
 			'fileManager' => array(
 				'class' => 'webnula2.extensions.elfinder.TinyMceElFinder',
 				'popupConnectorRoute' => '/cms/elfinder/elfinderTinyMce',

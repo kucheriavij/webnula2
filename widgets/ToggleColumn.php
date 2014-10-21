@@ -116,8 +116,13 @@ function() {
 			$icon = ($checked ? $this->checkedIcon : $this->uncheckedIcon);
 			$url = $this->grid->controller->createUrl($this->toggleAction, array('id' => $data->{$button['primaryKey']}, 'attribute' => $button['name'], 'model' => strtr($modelId, array('\\' => '_'))));
 
+			if( !isset($button['options']) ) {
+				$button['options'] = array(
+					'style' => 'display:block;white-space: nowrap;margin-top: 5px;',
+				);
+			}
 			unset($button['name'],$button['value']);
-			echo \CHtml::link('<i class="' . $icon . '"></i>'.$button['label'], $url);
+			echo \CHtml::link('<i class="' . $icon . '"></i>&nbsp;'.$button['label'], $url, $button['options']);
 		}
 	}
 }

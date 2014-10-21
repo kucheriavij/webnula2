@@ -109,7 +109,7 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 			)
 		) );
 
-		$Yii->params->add( 'imageSizes', array('t260x180' => array(
+		$Yii->params['imageSizes'] = array_merge($Yii->params['imageSizes'], array('t260x180' => array(
 			'method' => 'cropInset',
 			'width' => 260,
 			'height' => 180,

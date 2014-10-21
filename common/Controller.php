@@ -60,6 +60,20 @@ class Controller extends \CController {
 	}
 
 	/**
+	 * @param string $name
+	 *
+	 * @return mixed|void
+	 * @throws \CException
+	 */
+	public function __get($name)
+	{
+		if(isset($this->params[$name])) {
+			return $this->params[$name];
+		}
+		return parent::__get($name);
+	}
+
+	/**
 	 * @param string $cssFile
 	 */
 	public function registerCssFile($cssFile) {
@@ -186,7 +200,8 @@ class Controller extends \CController {
 				$pathInfo = trim($rawPathInfo, '/');
 
 				foreach($this->rules as $rule) {
-					if(($actionID = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo))) {
+					if(($action = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo))) {
+						$actionID = $action;
 						$this->params->mergeWith($_GET);
 						break;
 					}
