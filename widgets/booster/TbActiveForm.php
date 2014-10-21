@@ -834,7 +834,7 @@ class TbActiveForm extends \CActiveForm
 	 */
 	public function imagesFieldGroup($model, $attribute, $options)
 	{
-		$this->widgetGroupInternal('webnula2\widgets\Image', $model, $attribute, $options);
+		return $this->widgetGroupInternal('webnula2\widgets\Image', $model, $attribute, $options);
 	}
 
 	/**
