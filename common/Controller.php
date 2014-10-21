@@ -186,6 +186,19 @@ class Controller extends \CController {
 	}
 
 	/**
+	 * @param string $route
+	 * @param array $params
+	 * @param string $ampersand
+	 *
+	 * @return mixed
+	 */
+	public function createUrl( $route, $params = array(), $ampersand = '&' )
+	{
+		return \Yii::app()->createUrl($route,$params,$ampersand);
+	}
+
+
+	/**
 	 * Run the controller action.
 	 */
 	public function run($actionID)
