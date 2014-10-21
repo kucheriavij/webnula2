@@ -167,17 +167,11 @@ final class UrlManager extends \CApplicationComponent
 
 		if ( $route instanceof Section ) {
 			$url = $route->url;
-			if ( $this->appendParams ) {
-				$url = rtrim( $url . '/' . $this->createPathInfo( $params, '/', '/' ), '/' );
+			if ( $route !== '' )
+				$url .= $this->urlSuffix;
+			$query = $this->createPathInfo( $params, '=', $ampersand );
 
-				return $url === '' ? $url : $url . $this->urlSuffix;
-			} else {
-				if ( $route !== '' )
-					$url .= $this->urlSuffix;
-				$query = $this->createPathInfo( $params, '=', $ampersand );
-
-				return $query === '' ? $url : $url . '?' . $query;
-			}
+			return $query === '' ? $url : $url . '?' . $query;
 		} else {
 			$route = trim( $route, '/' );
 			foreach ( $this->_rules as $i => $rule ) {
