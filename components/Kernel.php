@@ -126,6 +126,12 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 				'kernel' => $this,
 			));
 		}
+
+		foreach( $Yii->getModules() as $id => $config )
+		{
+			$basePath = dirname(\Yii::getPathOfAlias(str_replace('\\', '.', $config['class'])));
+			\Yii::setPathOfAlias("$id", $basePath);
+		}
 	}
 
 	private function prepare(\CWebApplication $Yii)
@@ -159,12 +165,6 @@ final class Kernel extends \CComponent implements \IApplicationComponent
 			if ( $preload )
 				$this->cs->registerPackage( $name );
 			$packages[$name] = $definition;
-		}
-
-		foreach( $modules as $id => $config )
-		{
-			$basePath = dirname(\Yii::getPathOfAlias(str_replace('\\', '.', $config['class'])));
-			\Yii::setPathOfAlias("$id", $basePath);
 		}
 	}
 
