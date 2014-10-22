@@ -204,7 +204,7 @@ class CmsModule extends WebModule
 		foreach ( $this->models as $model => $title ) {
 			list( $id, $className ) = explode( ':', $model, 2 );
 			if ( isset( $modules[$id] ) ) {
-				$className = sprintf( "%s\models\%s", self::dirname( $modules[$id]['class'] ), $className );
+				$className = sprintf( "%s\models\%s", $id, $className );
 				$this->models[$className] = $title;
 				unset( $this->models[$model] );
 			}
