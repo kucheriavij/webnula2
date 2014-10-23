@@ -220,11 +220,11 @@ class Controller extends \CController {
 					}
 				}
 			}
-		} else {
-			$action = (string)mb_substr($rawPathInfo, 1, mb_strpos($rawPathInfo, '/', 1)-1);
-			if( !empty($action) && $actionID != 'error' ) {
-				$actionID = $action;
-			}
+		}
+
+		$action = (string)mb_substr($rawPathInfo, 1, mb_strpos($rawPathInfo, '/', 1)-1);
+		if( !empty($action) && $actionID != 'error' ) {
+			$actionID = $action;
 		}
 
 		// run action
