@@ -42,6 +42,21 @@ class Controller extends \CController {
 	public $cs;
 
 	/**
+	 * @var string
+	 */
+	private $_pageTitle;
+
+	/**
+	 * @var array
+	 */
+	private $_titles = array();
+
+	/**
+	 * @var array
+	 */
+	private $_breadcrumbs= array();
+
+	/**
 	 *
 	 */
 	public function init()
@@ -57,13 +72,33 @@ class Controller extends \CController {
 				\Yii::app()->getAssetManager()->publish( $assetsPath )
 			);
 		}
+
+		if(isset($this->section)) {
+			foreach( $this->section->cache(1000)->getParents('publish=1') as $parent ) {
+				$this->_breadcrumbs[] = array($parent->title, $parent->url);
+			}
+			$this->_breadcrumbs[] = array($this->section->title, $this->section->url);
+		}
 	}
 
 	/**
 	 * @param string $name
 	 *
-	 * @return mixed|void
-	 * @throws \CException
+	 * @return bool
+	 */
+	public function __isset($name)
+	{
+		if( isset($this->params[$name])) {
+			return true;
+		} else {
+			return parent::__isset($name);
+		}
+	}
+
+	/**
+	 * @param string $name
+	 *
+	 * @return mixed
 	 */
 	public function __get($name)
 	{
@@ -157,6 +192,41 @@ class Controller extends \CController {
 	}
 
 	/**
+	 * @param $item
+	 */
+	public function addLinkItem($item)
+	{
+		if( !is_array($item) ) {
+			$item = array($item);
+		}
+		$this->_breadcrumbs[] = $item;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLinkItems()
+	{
+		return $this->_breadcrumbs;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPageTitle()
+	{
+		if($this->_pageTitle === null) {
+			foreach( $this->_breadcrumbs as $linkItem ) {
+				$this->_titles[] = $linkItem[0];
+			}
+
+			$this->_pageTitle = implode(' :: ', array_reverse($this->_titles));
+		}
+		return $this->_pageTitle;
+	}
+
+
+	/**
 	 *
 	 */
 	private function processRules()
@@ -186,24 +256,12 @@ class Controller extends \CController {
 	}
 
 	/**
-	 * @param string $route
-	 * @param array $params
-	 * @param string $ampersand
-	 *
-	 * @return mixed
-	 */
-	public function createUrl( $route, $params = array(), $ampersand = '&' )
-	{
-		return \Yii::app()->createUrl($route,$params,$ampersand);
-	}
-
-
-	/**
 	 * Run the controller action.
 	 */
 	public function run($actionID)
 	{
 		$rawPathInfo = $this->params['routeInfo'];
+
 		if( !empty($this->rules) ) {
 			if( is_string($this->rules) )
 				$actionID = $this->rules;
@@ -211,10 +269,8 @@ class Controller extends \CController {
 				$manager = \Yii::app()->getUrlManager();
 				$request = \Yii::app()->getRequest();
 				$pathInfo = trim($rawPathInfo, '/');
-
 				foreach($this->rules as $rule) {
-					if(($action = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo))) {
-						$actionID = $action;
+					if(($actionID = $rule->parseUrl($manager, $request, $pathInfo, $rawPathInfo))) {
 						$this->params->mergeWith($_GET);
 						break;
 					}
@@ -222,16 +278,19 @@ class Controller extends \CController {
 			}
 		}
 
-		$action = (string)mb_substr($rawPathInfo, 1, mb_strpos($rawPathInfo, '/', 1)-1);
-		if( !empty($action) && $actionID != 'error' ) {
-			$actionID = $action;
+		if( $actionID === false && trim($rawPathInfo, '/') !== '' ) {
+			$action = (string)mb_substr( $rawPathInfo, 1, mb_strpos( $rawPathInfo, '/', 1 ) - 1 );
+			if ( !empty( $action ) && $actionID != 'error' ) {
+				$actionID = $action;
+			}
 		}
 
 		// run action
 		if(($action=$this->createAction($actionID))!==null) {
 			$this->runActionWithFilters($action,$this->filters());
-		} else
-			$this->missingAction($actionID);
+		} else {
+			$this->missingAction( $actionID );
+		}
 	}
 
 	/**
