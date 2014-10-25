@@ -8,9 +8,9 @@ namespace webnula2\models;
 
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
-use Imagine\Image\Color;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ManipulatorInterface;
+use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
 use webnula2\common\Coordinate;
 
@@ -319,8 +319,8 @@ final class Image extends Entity
 		$w = intval( $config['width'] );
 		$h = intval( $config['height'] );
 
-		$fcolor = $config['color'] ?: '#000000';
-		$ftransparency = intval( $config['transparency'] ?: 100 );
+		$fcolor = !empty($config['color']) ? $config['color'] : '#000000';
+		$ftransparency = intval( !empty($config['transparency']) ? $config['transparency'] : 100 );
 
 
 		$size = new Box( $w, $h );
@@ -333,8 +333,8 @@ final class Image extends Entity
 		}
 		$pasteto = new Point( $x, $y );
 		$imagine = new Imagine();
-		$color = new Color( $fcolor, $ftransparency );
-		$image = $imagine->create( $size, $color );
+		$pallete = new RGB();
+		$image = $imagine->create( $size, $pallete->color($fcolor, $ftransparency) );
 
 		$image->paste( $img, $pasteto );
 
