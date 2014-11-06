@@ -49,6 +49,10 @@ class CmsModule extends WebModule
 	 * @var
 	 */
 	private $assetsUrl;
+	/**
+	 * @var array
+	 */
+	public $packages = array();
 
 	/**
 	 * @var array
@@ -107,10 +111,23 @@ class CmsModule extends WebModule
 		\Yii::setPathOfAlias( 'cms@layouts', $this->getViewPath() . '/layouts' );
 
 		if(is_array($packages = include dirname(__FILE__).'/packages.php')) {
-			foreach ( $packages as $name => $definition ) {
-				$this->cs->addPackage( $name, $definition );
-				$this->cs->registerPackage( $name );
+			$this->packages = \CMap::mergeArray($this->packages, $packages);
+		}
+
+		$modules = $this->getModules();
+		foreach ( $this->packages as $name => $definition ) {
+			if ( isset( $definition['baseUrl'] ) ) {
+				if ( preg_match( '!(\w+):assets!i', $definition['baseUrl'], $match ) && isset( $modules[$match[1]] ) ) {
+					$basePath = dirname( \Yii::getPathOfAlias(str_replace('\\', '.', $modules[$match[1]]['class']) ));
+					$definition['baseUrl'] =  ( YII_DEBUG ?
+						\Yii::app()->getAssetManager()->publish( $basePath . '/assets', false, -1, true ) :
+						\Yii::app()->getAssetManager()->publish( $basePath . '/assets' )
+					);
+				}
 			}
+
+			$this->cs->addPackage( $name, $definition );
+			$this->cs->registerPackage( $name );
 		}
 
 		\Yii::app()->viewRenderer->assign( array(
@@ -147,11 +164,11 @@ class CmsModule extends WebModule
 	public function menuItems()
 	{
 		$items = array(
-			array( 'label' => self::t( 'Structure' ), 'url' => array( 'section/index' )  ),
-			array( 'label' => self::t( 'Menu' ), 'url' => array( 'menu/index' )  ),
+			array( 'label' => self::t( 'Structure' ), 'url' => array( '/cms/section/index' )  ),
+			array( 'label' => self::t( 'Menu' ), 'url' => array( '/cms/menu/index' )  ),
 			array( 'label' => self::t( 'Management users' ), 'url' => "#", 'items' => array(
-				array( 'label' => self::t( 'Users' ), 'url' => array( 'user/index' )  ),
-				array( 'label' => self::t( 'Groups' ), 'url' => array( 'groups/index' )  )
+				array( 'label' => self::t( 'Users' ), 'url' => array( '/cms/user/index' )  ),
+				array( 'label' => self::t( 'Groups' ), 'url' => array( '/cms/groups/index' )  )
 			) ),
 		);
 
