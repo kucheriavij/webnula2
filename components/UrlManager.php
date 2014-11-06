@@ -306,6 +306,7 @@ final class UrlManager extends \CApplicationComponent
 	{
 		$rawPathInfo = $request->getPathInfo();
 		$pathInfo = $this->removeUrlSuffix( $rawPathInfo, $this->urlSuffix );
+
 		foreach ( $this->_rules as $i => $rule ) {
 			if ( is_array( $rule ) )
 				$this->_rules[$i] = $rule = \Yii::createComponent( $rule );
@@ -315,21 +316,28 @@ final class UrlManager extends \CApplicationComponent
 			}
 		}
 
-		$route = trim( $pathInfo, '/' );
-		$segments = array();
-
-		$segments[] = '/' . $route . '/';
-		while ( ( $pos = strrpos( $route, '/' ) ) !== false ) {
-			$route = substr( $route, 0, $pos );
-			$segments[] = '/' . $route . '/';
-		}
-		$segments[] = '/';
-
-
 		$criteria = new \CDbCriteria();
-		$criteria->compare('publish', 1);
-		$criteria->order = 'level DESC, left_key DESC';
-		$criteria->addInCondition( 'url', $segments );
+		if( $rawPathInfo === '' ) {
+			$criteria->compare( 'publish', 1 );
+			$criteria->compare('name', 'home');
+			$criteria->limit = 1;
+		} else {
+			$route = trim( $pathInfo, '/' );
+			$segments = array();
+
+			$segments[] = '/' . $route . '/';
+			while ( ( $pos = strrpos( $route, '/' ) ) !== false ) {
+				$route = substr( $route, 0, $pos );
+				$segments[] = '/' . $route . '/';
+			}
+			$segments[] = '/';
+
+
+			$criteria->compare( 'publish', 1 );
+			$criteria->order = 'level DESC, left_key DESC';
+			$criteria->limit = 1;
+			$criteria->addInCondition( 'url', $segments );
+		}
 
 		if ( null !== $section = Section::model()->find( $criteria ) ) {
 			$this->getParams()->add('routeInfo', str_replace($section->url, '/', '/'.$rawPathInfo.'/'));
