@@ -4,136 +4,133 @@
  * @license LICENSE
  */
 String.prototype.translit = (function () {
-    var L = {
-            'А': 'A', 'а': 'a', 'Б': 'B', 'б': 'b', 'В': 'V', 'в': 'v', 'Г': 'G', 'г': 'g',
-            'Д': 'D', 'д': 'd', 'Е': 'E', 'е': 'e', 'Ё': 'Yo', 'ё': 'yo', 'Ж': 'Zh', 'ж': 'zh',
-            'З': 'Z', 'з': 'z', 'И': 'I', 'и': 'i', 'Й': 'Y', 'й': 'y', 'К': 'K', 'к': 'k',
-            'Л': 'L', 'л': 'l', 'М': 'M', 'м': 'm', 'Н': 'N', 'н': 'n', 'О': 'O', 'о': 'o',
-            'П': 'P', 'п': 'p', 'Р': 'R', 'р': 'r', 'С': 'S', 'с': 's', 'Т': 'T', 'т': 't',
-            'У': 'U', 'у': 'u', 'Ф': 'F', 'ф': 'f', 'Х': 'Kh', 'х': 'kh', 'Ц': 'Ts', 'ц': 'ts',
-            'Ч': 'Ch', 'ч': 'ch', 'Ш': 'Sh', 'ш': 'sh', 'Щ': 'Sch', 'щ': 'sch', 'Ъ': '', 'ъ': '',
-            'Ы': 'Y', 'ы': 'y', 'Ь': "", 'ь': "", 'Э': 'E', 'э': 'e', 'Ю': 'Yu', 'ю': 'yu',
-            'Я': 'Ya', 'я': 'ya'
-        },
-        r = '',
-        k;
-    for (k in L) r += k;
-    r = new RegExp('[' + r + ']', 'g');
-    k = function (a) {
-        return a in L ? L[a] : '';
-    };
-    return function () {
-        return this.replace(r, k);
-    };
+	var L = {
+			'А': 'A', 'а': 'a', 'Б': 'B', 'б': 'b', 'В': 'V', 'в': 'v', 'Г': 'G', 'г': 'g',
+			'Д': 'D', 'д': 'd', 'Е': 'E', 'е': 'e', 'Ё': 'Yo', 'ё': 'yo', 'Ж': 'Zh', 'ж': 'zh',
+			'З': 'Z', 'з': 'z', 'И': 'I', 'и': 'i', 'Й': 'Y', 'й': 'y', 'К': 'K', 'к': 'k',
+			'Л': 'L', 'л': 'l', 'М': 'M', 'м': 'm', 'Н': 'N', 'н': 'n', 'О': 'O', 'о': 'o',
+			'П': 'P', 'п': 'p', 'Р': 'R', 'р': 'r', 'С': 'S', 'с': 's', 'Т': 'T', 'т': 't',
+			'У': 'U', 'у': 'u', 'Ф': 'F', 'ф': 'f', 'Х': 'Kh', 'х': 'kh', 'Ц': 'Ts', 'ц': 'ts',
+			'Ч': 'Ch', 'ч': 'ch', 'Ш': 'Sh', 'ш': 'sh', 'Щ': 'Sch', 'щ': 'sch', 'Ъ': '', 'ъ': '',
+			'Ы': 'Y', 'ы': 'y', 'Ь': "", 'ь': "", 'Э': 'E', 'э': 'e', 'Ю': 'Yu', 'ю': 'yu',
+			'Я': 'Ya', 'я': 'ya'
+		},
+		r = '',
+		k;
+	for (k in L) r += k;
+	r = new RegExp('[' + r + ']', 'g');
+	k = function (a) {
+		return a in L ? L[a] : '';
+	};
+	return function () {
+		return this.replace(r, k);
+	};
 })();
 
-angular.module('cms', [
-    'cms.imagesuploader',
-    'cms.fileuploader',
-    'cms.translite'
-]).factory('$uploader', [function() {
-    return {
-        upload : function(options) {
-            return new function() {
-                if (!options.file || !options.url) {
-                    return false;
-                }
 
-                this.xhr = new XMLHttpRequest();
-                this.reader = new FileReader();
+angular.module('cms.common', []).factory('$uploader', [function() {
+	return {
+		upload : function(options) {
+			return new function() {
+				if (!options.file || !options.url) {
+					return false;
+				}
 
-                this.progress = 0;
-                this.uploaded = false;
-                this.successful = false;
-                this.lastError = false;
+				this.xhr = new XMLHttpRequest();
+				this.reader = new FileReader();
 
-                var self = this;
-                var uploadCanceled = false;
+				this.progress = 0;
+				this.uploaded = false;
+				this.successful = false;
+				this.lastError = false;
 
-                self.cancelUpload = function () {
-                    uploadCanceled = true;
-                    this.xhr.abort();
-                }
+				var self = this;
+				var uploadCanceled = false;
 
-                self.reader.onload = function () {
-                    self.xhr.upload.addEventListener("progress", function (e) {
-                        if (e.lengthComputable) {
-                            if (options.onprogress instanceof Function) {
-                                options.onprogress.call(self, e.loaded, e.total);
-                            }
-                        }
-                    }, false);
+				self.cancelUpload = function () {
+					uploadCanceled = true;
+					this.xhr.abort();
+				}
 
-                    self.xhr.upload.addEventListener("load", function () {
-                        self.progress = 100;
-                        self.uploaded = true;
-                    }, false);
+				self.reader.onload = function () {
+					self.xhr.upload.addEventListener("progress", function (e) {
+						if (e.lengthComputable) {
+							if (options.onprogress instanceof Function) {
+								options.onprogress.call(self, e.loaded, e.total);
+							}
+						}
+					}, false);
 
-                    self.xhr.upload.addEventListener("error", function (e) {
-                        self.lastError = {
-                            code: 1,
-                            text: 'Error uploading on server'
-                        };
-                    }, false);
+					self.xhr.upload.addEventListener("load", function () {
+						self.progress = 100;
+						self.uploaded = true;
+					}, false);
 
-                    self.xhr.onreadystatechange = function () {
-                        var callbackDefined = options.oncomplete instanceof Function;
+					self.xhr.upload.addEventListener("error", function (e) {
+						self.lastError = {
+							code: 1,
+							text: 'Error uploading on server'
+						};
+					}, false);
 
-                        if (this.readyState == 4) {
-                            if (this.status == 200) {
-                                if (!self.uploaded) {
-                                    if (callbackDefined) {
-                                        options.oncomplete.call(self, false);
-                                    }
-                                } else {
-                                    self.successful = true;
+					self.xhr.onreadystatechange = function () {
+						var callbackDefined = options.oncomplete instanceof Function;
 
-                                    if (callbackDefined) {
-                                        options.oncomplete.call(self, true, this.responseText, uploadCanceled);
-                                    }
-                                }
-                            } else {
-                                self.lastError = {
-                                    code: this.status,
-                                    text: 'HTTP response code is not OK (' + this.status + ')'
-                                };
+						if (this.readyState == 4) {
+							if (this.status == 200) {
+								if (!self.uploaded) {
+									if (callbackDefined) {
+										options.oncomplete.call(self, false);
+									}
+								} else {
+									self.successful = true;
 
-                                if (callbackDefined) {
-                                    options.oncomplete.call(self, false, null, uploadCanceled);
-                                }
-                            }
-                        }
-                    };
+									if (callbackDefined) {
+										options.oncomplete.call(self, true, this.responseText, uploadCanceled);
+									}
+								}
+							} else {
+								self.lastError = {
+									code: this.status,
+									text: 'HTTP response code is not OK (' + this.status + ')'
+								};
 
-                    self.xhr.open("POST", options.url);
-                    self.xhr.setRequestHeader("Cache-Control", "no-cache");
-                    self.xhr.setRequestHeader("Accept", "text/html");
+								if (callbackDefined) {
+									options.oncomplete.call(self, false, null, uploadCanceled);
+								}
+							}
+						}
+					};
 
-                    if (self.xhr.sendAsBinary) {
-                        var boundary = "xxxxxxxxx";
+					self.xhr.open("POST", options.url);
+					self.xhr.setRequestHeader("Cache-Control", "no-cache");
+					self.xhr.setRequestHeader("Accept", "text/html");
 
-                        var body = "--" + boundary + "\r\n";
-                        body += "Content-Disposition: form-data; name=\"attribute\"\r\n\r\n" + options.attribute + "\r\n";
-                        body += "Content-Disposition: form-data; name='" + (options.fieldName || 'file') + "'; filename='" + unescape(encodeURIComponent(options.file.name)) + "'\r\n";
-                        body += "Accept: application/json\r\n"
-                        body += "Content-Type: application/octet-stream\r\n\r\n";
-                        body += self.reader.result + "\r\n";
-                        body += "--" + boundary + "--";
+					if (self.xhr.sendAsBinary) {
+						var boundary = "xxxxxxxxx";
 
-                        self.xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
-                        self.xhr.sendAsBinary(body);
-                    } else {
-                        var formData = new FormData();
-                        formData.append(options.fieldName || 'file', options.file);
-                        formData.append('attribute', options.attribute);
-                        self.xhr.send(formData);
-                    }
-                };
+						var body = "--" + boundary + "\r\n";
+						body += "Content-Disposition: form-data; name=\"attribute\"\r\n\r\n" + options.attribute + "\r\n";
+						body += "Content-Disposition: form-data; name='" + (options.fieldName || 'file') + "'; filename='" + unescape(encodeURIComponent(options.file.name)) + "'\r\n";
+						body += "Accept: application/json\r\n"
+						body += "Content-Type: application/octet-stream\r\n\r\n";
+						body += self.reader.result + "\r\n";
+						body += "--" + boundary + "--";
 
-                self.reader.readAsBinaryString(options.file);
-            };
-        }
-    };
+						self.xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+						self.xhr.sendAsBinary(body);
+					} else {
+						var formData = new FormData();
+						formData.append(options.fieldName || 'file', options.file);
+						formData.append('attribute', options.attribute);
+						self.xhr.send(formData);
+					}
+				};
+
+				self.reader.readAsBinaryString(options.file);
+			};
+		}
+	};
 }]).filter('filesize', function() {
 	return function(bytes, precision) {
 		if (isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '-';

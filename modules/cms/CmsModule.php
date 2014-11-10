@@ -111,11 +111,24 @@ class CmsModule extends WebModule
 		\Yii::setPathOfAlias( 'cms@layouts', $this->getViewPath() . '/layouts' );
 
 		if(is_array($packages = include dirname(__FILE__).'/packages.php')) {
-			$this->packages = \CMap::mergeArray($this->packages, $packages);
+			$packages = \CMap::mergeArray($this->packages, $packages);
+		}
+
+		$angular = array(
+			'cms.common',
+			'cms.fileuploader',
+			'cms.imagesuploader',
+			'cms.translite',
+		);
+		foreach( $this->packages as $name => $def ) {
+			if( isset($def['js']) && isset($def['angular']) && $def['angular'] === true ) {
+				unset($def['angular']);
+				$angular[] = $name;
+			}
 		}
 
 		$modules = $this->getModules();
-		foreach ( $this->packages as $name => $definition ) {
+		foreach ( $packages as $name => $definition ) {
 			if ( isset( $definition['baseUrl'] ) ) {
 				if ( preg_match( '!(\w+):assets!i', $definition['baseUrl'], $match ) && isset( $modules[$match[1]] ) ) {
 					$basePath = dirname( \Yii::getPathOfAlias(str_replace('\\', '.', $modules[$match[1]]['class']) ));
@@ -129,6 +142,8 @@ class CmsModule extends WebModule
 			$this->cs->addPackage( $name, $definition );
 			$this->cs->registerPackage( $name );
 		}
+
+		$this->cs->registerScript(__CLASS__, sprintf("angular.module('cms', %s);", \CJavaScript::encode($angular)), \CClientScript::POS_END);
 
 		\Yii::app()->viewRenderer->assign( array(
 			'cms' => $this,
@@ -187,12 +202,12 @@ class CmsModule extends WebModule
 	 */
 	public function beforeControllerAction( $controller, $action )
 	{
-		if ( !\Yii::app()->getUser()->checkAccess( 'Administrator' ) && ( $controller->id !== 'auth' && $action->id != 'login' ) ) {
+		if ( \Yii::app()->getUser()->checkAccess( 'Administrator' ) ) {
+			return true;
+		} else if( $controller->id !== 'auth' ) {
 			\Yii::app()->getUser()->loginRequired();
-
 			return false;
 		}
-
 		return true;
 	}
 
