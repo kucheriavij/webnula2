@@ -216,7 +216,8 @@ final class Image extends Entity
 		if( $name === 'url' ) {
 			return $this->file['url'];
 		} else {
-			$filePath = dirname( $this->file['path'] );
+			$mediaPath = \Yii::getPathOfAlias( 'webroot' );
+			$filePath = dirname( $mediaPath.$this->file['url'] );
 			$filename = $this->file['originalName'];
 			$url = dirname( $this->file['url'] );
 
